@@ -1,0 +1,202 @@
+// ============================================================================
+// Brewluxe - Contact Page Styles (Artisanal Roastery & Warm Hearth)
+// ============================================================================
+
+.contact-hero {
+  text-align: center;
+  max-width: 640px;
+  margin: 1.5rem auto 2.5rem;
+  padding: 0 1rem;
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--brew-caramel, #c4783c);
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-family: var(--brew-font-serif, 'Fraunces', serif);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    color: var(--brew-espresso, #2c1e16);
+    line-height: 1.15;
+    margin: 0 0 0.85rem;
+  }
+
+  .contact-subtext {
+    font-size: 1rem;
+    color: var(--brew-muted, #7c685b);
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Contact Info Grid
+// ----------------------------------------------------------------------------
+.contact-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.contact-info-card {
+  background: var(--brew-surface, #ffffff);
+  border: 1px solid var(--brew-border, #ede3da);
+  border-radius: var(--brew-radius-lg, 20px);
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  box-shadow: var(--brew-shadow-sm, 0 2px 8px rgba(44, 30, 22, 0.05));
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--brew-shadow-md, 0 8px 24px rgba(44, 30, 22, 0.08));
+  }
+
+  .contact-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--brew-sand, #f0e6dc);
+    color: var(--brew-espresso, #2c1e16);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-family: var(--brew-font-serif, 'Fraunces', serif);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--brew-espresso, #2c1e16);
+    margin: 0 0 0.4rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: var(--brew-muted, #7c685b);
+    line-height: 1.5;
+    margin: 0;
+    word-break: break-word;
+  }
+
+  &.hours-card {
+    background: linear-gradient(135deg, rgba(42, 75, 50, 0.04), rgba(196, 120, 60, 0.04));
+    border-color: rgba(42, 75, 50, 0.2);
+
+    .contact-icon-box {
+      background: var(--brew-forest, #2a4b32);
+      color: #ffffff;
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Contact Form Card
+// ----------------------------------------------------------------------------
+.contact-form-card {
+  max-width: 680px;
+  margin: 0 auto 3rem;
+  background: var(--brew-surface, #ffffff);
+  border: 1px solid var(--brew-border, #ede3da);
+  border-radius: var(--brew-radius-xl, 24px);
+  padding: 2.25rem 2rem;
+  box-shadow: var(--brew-shadow-md, 0 8px 24px rgba(44, 30, 22, 0.08));
+
+  @media (max-width: 600px) {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--brew-forest, #2a4b32);
+      margin-bottom: 0.35rem;
+    }
+
+    h2 {
+      font-family: var(--brew-font-serif, 'Fraunces', serif);
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--brew-espresso, #2c1e16);
+      margin: 0 0 0.4rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: var(--brew-muted, #7c685b);
+      margin: 0;
+    }
+  }
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+
+    @media (min-width: 600px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .contact-textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.5;
+  }
+
+  .contact-feedback-box {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: #edf7ed;
+    color: #1e4620;
+    border: 1px solid #c8e6c9;
+    border-radius: var(--brew-radius-md, 12px);
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    ion-icon {
+      font-size: 1.35rem;
+      color: var(--brew-forest, #2a4b32);
+      flex-shrink: 0;
+    }
+  }
+
+  .submit-btn {
+    margin-top: 0.5rem;
+    height: 52px;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+}

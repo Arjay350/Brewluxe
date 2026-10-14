@@ -1,0 +1,204 @@
+/* ==========================================================================
+   Login Page Styles — Direction 1: Artisanal Roastery & Warm Hearth
+   ========================================================================== */
+
+.brew-header {
+  background: var(--ion-background-color);
+  border-bottom: 1px solid var(--brew-border-subtle);
+}
+
+.brew-toolbar {
+  --background: var(--ion-background-color);
+  --color: var(--brew-espresso);
+  padding: 4px 8px;
+}
+
+.brew-brand-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  .header-logo {
+    height: 38px;
+    width: auto;
+    border-radius: 8px;
+  }
+
+  .header-brand-name {
+    font-family: var(--brew-font-serif);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--brew-espresso);
+    letter-spacing: -0.02em;
+  }
+}
+
+.explore-link {
+  --color: var(--brew-sage);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.login-page {
+  --background: var(--ion-background-color);
+}
+
+.login-shell {
+  max-width: 480px;
+  margin: 40px auto 80px;
+  background: #FFFFFF;
+  border: 1px solid var(--brew-border-subtle);
+  border-radius: var(--brew-radius-xl);
+  padding: 36px 28px;
+  box-shadow: var(--brew-shadow-md);
+
+  @media (min-width: 600px) {
+    padding: 44px 36px;
+  }
+}
+
+.brand-badge-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+
+  .login-brand-logo {
+    height: 72px;
+    width: auto;
+    object-fit: contain;
+  }
+}
+
+.login-header-text {
+  text-align: center;
+  margin-bottom: 24px;
+
+  .login-title {
+    margin: 4px 0 8px;
+    font-size: 1.85rem;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+}
+
+.verification-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--brew-radius-md);
+  background: #E8F5E9;
+  border: 1px solid #C8E6C9;
+  margin-bottom: 20px;
+
+  .banner-icon-wrap {
+    font-size: 1.8rem;
+    color: #2E7D32;
+    display: grid;
+    place-items: center;
+  }
+
+  .banner-text {
+    strong {
+      display: block;
+      color: #1B5E20;
+      font-size: 0.9rem;
+    }
+
+    p {
+      margin: 2px 0 0;
+      color: #2E7D32;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.password-field-wrap {
+  position: relative;
+}
+
+.password-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .brew-input {
+    padding-right: 48px;
+  }
+
+  .password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: #8D7668;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 4px;
+
+    &:hover {
+      color: var(--brew-espresso);
+    }
+  }
+}
+
+.form-error-alert {
+  padding: 12px 14px;
+  border-radius: var(--brew-radius-md);
+  background: #FDE8E8;
+  border: 1px solid #F5C6CB;
+  color: var(--ion-color-danger);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.login-submit-btn {
+  --background: var(--brew-espresso);
+  --color: #FFFFFF;
+  min-height: 52px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-top: 12px;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--brew-border-subtle);
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+  }
+
+  .register-link {
+    color: var(--brew-sage);
+    font-weight: 700;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+

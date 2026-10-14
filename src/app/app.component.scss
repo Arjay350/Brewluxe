@@ -1,0 +1,245 @@
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at top, rgba(165, 121, 76, 0.2), rgba(31, 20, 16, 0.96) 60%);
+  animation: splashFade 1.5s ease forwards;
+}
+
+.splash-logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  color: #f6efe9;
+  text-align: center;
+}
+
+.splash-logo {
+  width: 110px;
+  height: 110px;
+  border-radius: 28px;
+  display: grid;
+  place-items: center;
+  background: #FFFFFF;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.28);
+  padding: 10px;
+  animation: splashZoom 1.3s ease;
+
+  .splash-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.splash-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 233, 0.72);
+}
+
+.splash-copy h2 {
+  margin: 8px 0 0;
+  font-family: var(--brew-font-serif, serif);
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  font-weight: 700;
+}
+
+.menu-toolbar {
+  --background: #F5EDE4;
+  --color: #2C1E16;
+  padding: 6px 12px;
+}
+
+.menu-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px;
+}
+
+.brand-logo-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #FFFFFF;
+  padding: 2px;
+  box-shadow: var(--brew-shadow-xs, 0 1px 3px rgba(44,30,22,0.1));
+}
+
+.brand-text strong {
+  display: block;
+  font-family: var(--brew-font-serif, serif);
+  color: #2C1E16;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.brand-text small {
+  display: block;
+  color: #755647;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.account-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 14px 8px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(47, 36, 27, 0.06);
+  border: 1px solid rgba(47, 36, 27, 0.08);
+}
+
+.account-avatar {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #2f241b;
+  color: #f5e9dc;
+}
+
+.account-avatar ion-icon {
+  font-size: 1.4rem;
+}
+
+.avatar-initials {
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  color: #f5e9dc;
+}
+
+.account-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account-meta strong {
+  color: #2f241b;
+  font-size: 0.92rem;
+}
+
+.account-meta span {
+  color: #684f44;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+ion-menu {
+  --background: #f9f2ec;
+}
+
+ion-menu ion-item {
+  --background: transparent;
+  --color: #2f241b;
+  --padding-start: 18px;
+  --padding-end: 18px;
+  --inner-padding-end: 10px;
+  margin-bottom: 4px;
+  --min-height: 44px;
+  border-radius: 12px;
+  margin-inline: 10px;
+  transition: background-color 0.2s ease;
+}
+
+ion-menu ion-item:hover {
+  --background: rgba(47, 36, 27, 0.04);
+}
+
+ion-menu ion-item ion-icon {
+  color: #2a3d2d;
+}
+
+.submenu-toggle-icon {
+  font-size: 1rem;
+  color: #7b6d64;
+  transition: transform 0.2s ease;
+}
+
+.parent-item.is-expanded {
+  --background: rgba(42, 61, 45, 0.06);
+}
+
+.submenu-container {
+  padding-left: 12px;
+  margin-top: 2px;
+  margin-bottom: 6px;
+  border-left: 2px solid rgba(42, 61, 45, 0.15);
+  margin-left: 26px;
+}
+
+.submenu-item {
+  --min-height: 38px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  font-size: 0.92rem;
+  margin-bottom: 2px;
+}
+
+.submenu-item ion-icon {
+  font-size: 1.15rem;
+  color: #4a634e;
+}
+
+ion-menu ion-badge {
+  --background: #2a3d2d;
+  --color: #fff;
+  min-width: 22px;
+  min-height: 22px;
+  font-size: 0.75rem;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.logout-wrap {
+  margin-top: auto;
+  padding: 12px 14px 18px;
+}
+
+.logout-btn {
+  --color: #2f241b;
+  --border-radius: 12px;
+  --background: rgba(47, 36, 27, 0.06);
+  font-weight: 600;
+}
+
+@keyframes splashZoom {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes splashFade {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  80% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

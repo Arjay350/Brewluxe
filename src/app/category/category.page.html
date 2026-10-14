@@ -1,0 +1,101 @@
+<ion-header class="ion-no-border brew-header">
+  <ion-toolbar class="brew-toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button menu="brewluxe-menu" aria-label="Open menu" class="brew-menu-btn"></ion-menu-button>
+    </ion-buttons>
+
+    <div class="brew-brand-header" routerLink="/menu">
+      <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="header-logo" />
+      <span class="header-brand-name">{{ category }}</span>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button routerLink="/cart" aria-label="View Cart" class="cart-nav-btn">
+        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+        <ion-badge *ngIf="itemCount > 0" class="nav-cart-badge">{{ itemCount }}</ion-badge>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="brew-page-shell">
+  <div class="brew-container">
+
+    <div class="category-hero">
+      <div class="category-nav-back">
+        <a routerLink="/menu" class="back-link">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+          <span>All Menu Categories</span>
+        </a>
+      </div>
+      <span class="eyebrow">Artisanal Selection</span>
+      <h1>{{ category }}</h1>
+      <p class="category-subtext">
+        Browse our fresh {{ category.toLowerCase() }} creations, crafted to order with premium ingredients.
+      </p>
+    </div>
+
+    <!-- Skeletons -->
+    <div class="category-products-grid" *ngIf="loading">
+      <div class="brew-card skeleton-card" *ngFor="let n of [1,2,3,4]">
+        <div class="brew-skeleton skeleton-img"></div>
+        <div class="brew-card-content">
+          <div class="brew-skeleton skeleton-title"></div>
+          <div class="brew-skeleton skeleton-desc"></div>
+          <div class="brew-skeleton skeleton-desc short"></div>
+          <div class="brew-skeleton skeleton-btn"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="category-products-grid" *ngIf="!loading && products.length">
+      <article
+        *ngFor="let product of products"
+        class="brew-card"
+        (click)="openProduct(product)"
+        tabindex="0"
+        [attr.aria-label]="product.name + ' - ₱' + product.price"
+      >
+        <div class="brew-card-image-wrap">
+          <img
+            [src]="product.image.toLowerCase().startsWith('http') || product.image.toLowerCase().startsWith('data:') ? product.image : 'assets/images/' + product.image"
+            [alt]="product.name"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="brew-badge brew-badge-caramel category-card-badge">{{ product.category }}</span>
+        </div>
+
+        <div class="brew-card-content">
+          <h3 class="brew-card-title">{{ product.name }}</h3>
+          <p class="brew-card-desc">{{ product.description }}</p>
+
+          <div class="brew-card-bottom">
+            <span class="brew-price">₱{{ product.price }}</span>
+            <ion-button
+              size="small"
+              class="brew-btn brew-btn-primary add-cat-btn"
+              (click)="$event.stopPropagation(); addToCart(product)"
+              aria-label="Add to cart"
+            >
+              <ion-icon slot="start" name="add-outline"></ion-icon>
+              <span>Add</span>
+            </ion-button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Empty State -->
+    <div class="brew-empty-state" *ngIf="!loading && !products.length">
+      <div class="empty-icon">☕</div>
+      <h3>No items found in {{ category }}</h3>
+      <p>We don't have available items in this category right now. Explore our other menu categories!</p>
+      <ion-button routerLink="/menu" class="brew-btn brew-btn-primary">
+        Browse Full Menu
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

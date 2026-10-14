@@ -1,0 +1,465 @@
+/* ==========================================================================
+   Product Detail Styles — Direction 1: Artisanal Roastery & Warm Hearth
+   ========================================================================== */
+
+/* Top Navigation Bar */
+.brew-header {
+  background: var(--ion-background-color);
+  border-bottom: 1px solid var(--brew-border-subtle);
+}
+
+.brew-toolbar {
+  --background: var(--ion-background-color);
+  --color: var(--brew-espresso);
+  padding: 4px 8px;
+}
+
+.brew-back-btn {
+  --color: var(--brew-espresso);
+}
+
+.brew-brand-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+
+  .header-logo {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .header-brand-name {
+    font-family: var(--brew-font-serif);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--brew-espresso);
+    letter-spacing: -0.02em;
+  }
+}
+
+.cart-nav-btn {
+  --color: var(--brew-espresso);
+  position: relative;
+  font-size: 1.35rem;
+
+  .nav-cart-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    border-radius: 50%;
+    --background: var(--brew-sage);
+    --color: #FFFFFF;
+  }
+}
+
+/* Detail Main Layout */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  padding: 24px 0 60px;
+
+  @media (min-width: 900px) {
+    grid-template-columns: 1fr 1.15fr;
+    gap: 48px;
+    align-items: start;
+  }
+}
+
+/* Left Media Column */
+.detail-media-column {
+  @media (min-width: 900px) {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.detail-image-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--brew-radius-xl);
+  overflow: hidden;
+  background: var(--brew-alabaster);
+  border: 1px solid var(--brew-border-subtle);
+  box-shadow: var(--brew-shadow-md);
+
+  .detail-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .detail-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    box-shadow: var(--brew-shadow-sm);
+  }
+}
+
+.detail-info-block {
+  margin-top: 20px;
+
+  .title-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .product-title {
+    margin: 4px 0 0;
+    font-size: clamp(1.8rem, 4vw, 2.3rem);
+    color: var(--brew-espresso);
+  }
+
+  .base-price-tag {
+    font-family: var(--brew-font-sans);
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--brew-sage);
+    white-space: nowrap;
+    padding-top: 4px;
+  }
+
+  .product-description {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--ion-color-medium);
+    margin: 0 0 16px;
+  }
+
+  .drink-perks-row {
+    display: flex;
+    gap: 16px;
+
+    .drink-perk {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--brew-espresso);
+
+      ion-icon {
+        color: var(--brew-sage);
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+/* Right Customizer Column */
+.customizer-card {
+  background: #FFFFFF;
+  border: 1px solid var(--brew-border-subtle);
+  border-radius: var(--brew-radius-xl);
+  padding: 24px;
+  box-shadow: var(--brew-shadow-sm);
+
+  @media (min-width: 600px) {
+    padding: 32px 28px;
+  }
+
+  .customizer-heading {
+    margin: 0 0 4px;
+    font-size: 1.45rem;
+  }
+
+  .customizer-subtext {
+    margin: 0 0 24px;
+    font-size: 0.88rem;
+    color: var(--ion-color-medium);
+  }
+
+  .pastry-fresh-banner {
+    background: var(--brew-cream);
+    border: 1px solid var(--brew-border-subtle);
+    border-radius: var(--brew-radius-lg);
+    padding: 16px;
+    margin-bottom: 24px;
+
+    .banner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--brew-caramel);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--brew-espresso);
+      line-height: 1.5;
+    }
+  }
+}
+
+/* Option Sections */
+.option-section {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--brew-border-subtle);
+
+  &:last-of-type {
+    border-bottom: none;
+    padding-bottom: 24px;
+  }
+}
+
+.option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  .option-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--brew-espresso);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .option-selection-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--brew-caramel);
+
+    &.muted {
+      color: var(--ion-color-medium);
+      font-weight: 500;
+    }
+  }
+}
+
+/* Chips Grids */
+.chips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.chips-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.brew-option-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: var(--brew-radius-pill);
+  background: var(--brew-alabaster);
+  border: 1px solid var(--brew-border-subtle);
+  color: var(--brew-espresso);
+  font-family: var(--brew-font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--brew-duration) var(--brew-ease);
+
+  &.small {
+    padding: 8px 6px;
+    font-size: 0.85rem;
+  }
+
+  &:hover {
+    background: rgba(44, 30, 22, 0.08);
+    transform: translateY(-1px);
+  }
+
+  &.is-selected {
+    background: var(--brew-espresso);
+    color: #FFFFFF;
+    border-color: var(--brew-espresso);
+    box-shadow: 0 4px 14px rgba(44, 30, 22, 0.2);
+
+    .chip-emoji {
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+    }
+  }
+
+  .chip-emoji {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+}
+
+/* Add-ons List */
+.addons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addon-row-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  min-height: 48px;
+  border-radius: var(--brew-radius-md);
+  background: #FFFFFF;
+  border: 1.5px solid var(--brew-border-subtle);
+  color: var(--brew-espresso);
+  font-family: var(--brew-font-sans);
+  cursor: pointer;
+  transition: all var(--brew-duration) var(--brew-ease);
+
+  &:hover {
+    background: var(--brew-alabaster);
+    border-color: var(--brew-border-strong);
+  }
+
+  &.is-selected {
+    background: rgba(42, 75, 50, 0.08);
+    border-color: var(--brew-sage);
+
+    .addon-name {
+      font-weight: 800;
+      color: var(--brew-sage);
+    }
+
+    .addon-price {
+      color: var(--brew-sage);
+    }
+  }
+
+  .addon-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .addon-icon {
+      font-size: 1.25rem;
+    }
+
+    .addon-name {
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+  }
+
+  .addon-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .addon-price {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ion-color-medium);
+    }
+
+    .addon-check-indicator {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--brew-sage);
+      font-size: 1.3rem;
+
+      .uncheck-dot {
+        font-size: 1.1rem;
+        color: #A08C80;
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+/* Order Action Bar */
+.order-action-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid var(--brew-alabaster);
+
+  @media (min-width: 500px) {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .qty-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .qty-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .submit-block {
+    flex: 1;
+
+    .add-to-cart-submit {
+      --background: var(--brew-espresso);
+      --color: #FFFFFF;
+      min-height: 52px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin: 0;
+    }
+  }
+}
+
+/* Skeleton Loading */
+.detail-loading-skeleton {
+  padding: 32px 0;
+  max-width: 600px;
+  margin: 0 auto;
+
+  .skeleton-detail-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--brew-radius-xl);
+    margin-bottom: 24px;
+  }
+
+  .skeleton-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .skeleton-line {
+      height: 16px;
+      border-radius: var(--brew-radius-sm);
+
+      &.title {
+        height: 32px;
+        width: 70%;
+      }
+
+      &.desc {
+        width: 90%;
+      }
+    }
+  }
+}

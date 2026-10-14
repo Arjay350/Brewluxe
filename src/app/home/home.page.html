@@ -1,0 +1,321 @@
+<ion-header class="ion-no-border brew-header">
+  <ion-toolbar class="brew-toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button menu="brewluxe-menu" aria-label="Open navigation menu" class="brew-menu-btn"></ion-menu-button>
+    </ion-buttons>
+
+    <div class="brew-brand-header" routerLink="/home">
+      <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="header-logo" />
+      <span class="header-brand-name">Brewluxe</span>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button routerLink="/cart" aria-label="View Cart" class="cart-nav-btn">
+        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+        <ion-badge *ngIf="itemCount > 0" class="nav-cart-badge">{{ itemCount }}</ion-badge>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="brew-page-shell">
+  <div class="brew-container">
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-dot"></span>
+            <span>Artisanal Coffee & Good Vibes</span>
+          </div>
+          <h1 class="hero-title">Good Drinks.<br /><em>Better Days.</em></h1>
+          <p class="hero-subtitle">
+            Crafted daily with rich espresso, iced drinks, refreshing shakes, and oven-fresh pastries. Made for your everyday rituals.
+          </p>
+
+          <div class="hero-actions">
+            <ion-button routerLink="/menu" class="brew-btn brew-btn-primary order-btn">
+              <span>Order Drinks Now</span>
+              <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+            </ion-button>
+            <ion-button routerLink="/about-us" fill="outline" class="brew-btn brew-btn-outline">
+              Our Story
+            </ion-button>
+          </div>
+
+          <div class="hero-perks">
+            <div class="perk-item">
+              <ion-icon name="cafe"></ion-icon>
+              <span>Freshly Brewed</span>
+            </div>
+            <div class="perk-divider">•</div>
+            <div class="perk-item">
+              <ion-icon name="leaf"></ion-icon>
+              <span>Real Ingredients</span>
+            </div>
+            <div class="perk-divider">•</div>
+            <div class="perk-item">
+              <ion-icon name="storefront"></ion-icon>
+              <span>Dine-in & Delivery</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-card">
+            <div class="hero-image-wrap">
+              <img src="assets/images/spanish-latte.webp" alt="Brewluxe Spanish Latte" loading="eager" />
+              <div class="hero-card-tag">Signature Drink</div>
+            </div>
+            <div class="hero-card-footer">
+              <div>
+                <strong>Spanish Latte</strong>
+                <span class="hero-card-meta">Espresso • Sweet Milk • Creamy</span>
+              </div>
+              <div class="hero-card-price">₱120</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Weather Drink Recommender Strip (Open-Meteo) -->
+    <section class="weather-section" *ngIf="weather" (click)="filterByWeather()" role="button" tabindex="0" (keydown.enter)="filterByWeather()">
+      <div class="weather-card">
+        <div class="weather-icon-box">{{ weather.icon }}</div>
+        <div class="weather-info">
+          <div class="weather-meta">
+            <span class="weather-pill">{{ weather.tag }}</span>
+            <span class="weather-temp">{{ weather.temperature }}°C · {{ weather.conditionText }}</span>
+          </div>
+          <p class="weather-headline">{{ weather.headline }}</p>
+        </div>
+        <ion-button fill="clear" class="weather-action-btn" (click)="$event.stopPropagation(); filterByWeather()">
+          <span>View Picks</span>
+          <ion-icon slot="end" name="chevron-forward"></ion-icon>
+        </ion-button>
+      </div>
+    </section>
+
+    <!-- Popular Categories Strip -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">Explore Our Menu</span>
+          <h2>Popular Categories</h2>
+        </div>
+        <a routerLink="/menu" class="section-link">View all</a>
+      </div>
+
+      <div class="category-chips-strip">
+        <button
+          *ngFor="let cat of categories"
+          class="category-chip"
+          [routerLink]="['/menu']"
+          [queryParams]="{ category: cat }"
+        >
+          <span class="cat-icon" [ngSwitch]="cat">
+            <span *ngSwitchCase="'Coffee'">☕</span>
+            <span *ngSwitchCase="'Iced Coffee'">🧊</span>
+            <span *ngSwitchCase="'Frappes'">❄️</span>
+            <span *ngSwitchCase="'Pastries'">🥐</span>
+            <span *ngSwitchCase="'Shakes'">🥤</span>
+            <span *ngSwitchCase="'Non-Coffee'">🍵</span>
+            <span *ngSwitchDefault>✨</span>
+          </span>
+          <span class="cat-label">{{ cat }}</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Customer Favorites & Search Section -->
+    <section class="section-block">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">{{ search ? 'Search Results' : 'Best Sellers' }}</span>
+          <h2>{{ search ? 'Matching Drinks & Pastries' : 'Customer Favorites' }}</h2>
+        </div>
+        <a routerLink="/menu" class="section-link" *ngIf="!search">See full menu</a>
+      </div>
+
+      <div class="search-wrap">
+        <ion-searchbar
+          [(ngModel)]="search"
+          placeholder="Search favorites: Spanish Latte, Croissant, Matcha…"
+          aria-label="Search drinks and pastries"
+          [debounce]="150"
+          show-clear-button="focus"
+          class="brew-searchbar"
+        ></ion-searchbar>
+      </div>
+
+      <!-- Loading Skeletons -->
+      <div class="products-grid" *ngIf="loading">
+        <div class="brew-card skeleton-card" *ngFor="let n of [1,2,3,4]">
+          <div class="brew-skeleton skeleton-img"></div>
+          <div class="brew-card-content">
+            <div class="brew-skeleton skeleton-title"></div>
+            <div class="brew-skeleton skeleton-desc"></div>
+            <div class="brew-skeleton skeleton-desc short"></div>
+            <div class="brew-skeleton skeleton-btn"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div class="error-banner" *ngIf="productError" role="alert">
+        <p>{{ productError }}</p>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" *ngIf="!loading && visibleProducts.length">
+        <article
+          *ngFor="let product of visibleProducts"
+          class="brew-card"
+          (click)="openProduct(product)"
+          tabindex="0"
+          [attr.aria-label]="'View details for ' + product.name"
+        >
+          <div class="brew-card-image-wrap">
+            <img
+              [src]="product.image.toLowerCase().startsWith('http') || product.image.toLowerCase().startsWith('data:') ? product.image : 'assets/images/' + product.image"
+              [alt]="product.name"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="brew-badge brew-badge-caramel card-badge">{{ product.category }}</span>
+          </div>
+
+          <div class="brew-card-content">
+            <h3 class="brew-card-title">{{ product.name }}</h3>
+            <p class="brew-card-desc">{{ product.description }}</p>
+
+            <div class="brew-card-bottom">
+              <span class="brew-price">₱{{ product.price }}</span>
+              <ion-button
+                size="small"
+                class="brew-btn brew-btn-primary add-mini-btn"
+                (click)="$event.stopPropagation(); addToCart(product)"
+                aria-label="Add to cart"
+              >
+                <ion-icon slot="start" name="add-outline"></ion-icon>
+                <span>Add</span>
+              </ion-button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Empty State -->
+      <div class="brew-empty-state" *ngIf="!loading && !visibleProducts.length">
+        <div class="empty-icon">☕</div>
+        <h3>No drinks found</h3>
+        <p>We couldn't find any items matching "{{ search }}". Try searching for coffee, latte, or pastry.</p>
+        <ion-button (click)="search = ''" class="brew-btn brew-btn-primary">
+          Clear Search
+        </ion-button>
+      </div>
+    </section>
+
+    <!-- Why Brewluxe / Values Grid -->
+    <section class="section-block values-section">
+      <div class="section-header center">
+        <span class="eyebrow">The Brewluxe Difference</span>
+        <h2>Made with Care, Sip After Sip</h2>
+      </div>
+
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon">
+            <ion-icon name="star"></ion-icon>
+          </div>
+          <h3>Premium Quality</h3>
+          <p>Hand-selected coffee beans and high-grade dairy for deep, rich flavour in every cup.</p>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon">
+            <ion-icon name="storefront"></ion-icon>
+          </div>
+          <h3>Cozy Ambiance</h3>
+          <p>A welcoming space designed for studying, catching up, and slow mornings.</p>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon">
+            <ion-icon name="leaf"></ion-icon>
+          </div>
+          <h3>Wide Variety</h3>
+          <p>From strong double-shots to velvety specialty drinks and icy fruit shakes.</p>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon">
+            <ion-icon name="bag"></ion-icon>
+          </div>
+          <h3>Affordable Luxury</h3>
+          <p>Top-tier café drinks crafted with passion at friendly student prices.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Story / Student Project Card -->
+    <section class="section-block story-section" id="story">
+      <div class="story-box">
+        <div class="story-text">
+          <span class="eyebrow">Our Story</span>
+          <h2>Crafted by Students, Inspired by Café Culture</h2>
+          <p>
+            Brewluxe began as a creative venture by third-year Information Technology students from Technological Institute of the Philippines - Quezon City. We set out to blend real web engineering with the warmth of our favorite neighborhood coffee roasteries.
+          </p>
+          <ion-button routerLink="/about-us" class="brew-btn brew-btn-primary">
+            Meet the Team
+          </ion-button>
+        </div>
+        <div class="story-badge-wrap">
+          <img src="assets/images/brewluxe-logo.png" alt="Brewluxe seal" class="story-logo-img" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Hours, Location & Contact Strip -->
+    <section class="section-block hours-location-section" id="hours-location">
+      <div class="info-strip-grid">
+        <div class="info-card">
+          <div class="info-icon">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+          <div>
+            <h3>Opening Hours</h3>
+            <p>Monday – Sunday</p>
+            <strong>8:00 AM – 9:00 PM</strong>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">
+            <ion-icon name="location-outline"></ion-icon>
+          </div>
+          <div>
+            <h3>Café Location</h3>
+            <p>TIP - Quezon City Campus</p>
+            <strong>Available for Pickup & Delivery</strong>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">
+            <ion-icon name="call-outline"></ion-icon>
+          </div>
+          <div>
+            <h3>Need Assistance?</h3>
+            <p>Have questions or feedback?</p>
+            <a routerLink="/contact" class="info-link">Get in Touch →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</ion-content>

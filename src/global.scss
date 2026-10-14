@@ -1,0 +1,522 @@
+/*
+ * App Global CSS — Brewluxe Artisanal Roastery Theme
+ * ----------------------------------------------------------------------------
+ */
+
+/* Import Brewluxe Design System Tokens */
+@import "./theme/variables.scss";
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/* ==========================================================================
+   Base Typography & Layout
+   ========================================================================== */
+html,
+body,
+ion-app {
+  font-family: var(--brew-font-sans);
+  color: var(--ion-text-color);
+  background-color: var(--ion-background-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, .brew-serif {
+  font-family: var(--brew-font-serif);
+  color: var(--ion-color-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 0;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  line-height: 1.12;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+p, span, label, small {
+  font-family: var(--brew-font-sans);
+}
+
+.eyebrow {
+  font-family: var(--brew-font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ion-color-tertiary);
+  margin: 0 0 6px 0;
+  display: inline-block;
+}
+
+/* ==========================================================================
+   Responsive Layout Utilities
+   ========================================================================== */
+.brew-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  box-sizing: border-box;
+
+  @media (min-width: 768px) {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  @media (min-width: 1024px) {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+.brew-page-shell {
+  --background: var(--ion-background-color);
+  --color: var(--ion-text-color);
+}
+
+/* ==========================================================================
+   Reusable Design System Components
+   ========================================================================== */
+
+/* 1. Buttons */
+.brew-btn {
+  --border-radius: var(--brew-radius-md);
+  font-family: var(--brew-font-sans);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  min-height: 48px;
+  transition: transform var(--brew-duration) var(--brew-ease), box-shadow var(--brew-duration) var(--brew-ease);
+
+  &:hover {
+    transform: translateY(-1.5px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.brew-btn-primary {
+  --background: var(--brew-espresso);
+  --color: #FFFFFF;
+  --box-shadow: var(--brew-shadow-sm);
+
+  &:hover {
+    --box-shadow: var(--brew-shadow-md);
+  }
+}
+
+.brew-btn-secondary {
+  --background: var(--brew-sage);
+  --color: #FFFFFF;
+  --box-shadow: var(--brew-shadow-sm);
+}
+
+.brew-btn-caramel {
+  --background: var(--brew-caramel);
+  --color: #FFFFFF;
+}
+
+.brew-btn-outline {
+  --border-color: var(--brew-espresso);
+  --color: var(--brew-espresso);
+  --background: transparent;
+}
+
+/* 2. Menu Item Cards */
+.brew-card {
+  background: var(--ion-card-background);
+  border-radius: var(--brew-radius-lg);
+  border: 1px solid var(--brew-border-subtle);
+  box-shadow: var(--brew-shadow-sm);
+  overflow: hidden;
+  margin: 0;
+  transition: transform var(--brew-duration) var(--brew-ease), box-shadow var(--brew-duration) var(--brew-ease);
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--brew-shadow-md);
+    border-color: var(--brew-border-strong);
+  }
+
+  .brew-card-image-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--brew-alabaster);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s var(--brew-ease);
+    }
+  }
+
+  &:hover .brew-card-image-wrap img {
+    transform: scale(1.05);
+  }
+
+  .brew-card-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .brew-card-title {
+    font-family: var(--brew-font-serif);
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--brew-espresso);
+    margin: 0;
+  }
+
+  .brew-card-desc {
+    font-size: 0.825rem;
+    color: var(--ion-color-medium);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .brew-card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--brew-border-subtle);
+  }
+
+  .brew-price {
+    font-family: var(--brew-font-sans);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--brew-espresso);
+  }
+}
+
+/* 3. Badges */
+.brew-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--brew-radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--brew-alabaster);
+  color: var(--brew-espresso);
+}
+
+.brew-badge-sage {
+  background: rgba(42, 75, 50, 0.12);
+  color: var(--brew-sage);
+}
+
+.brew-badge-caramel {
+  background: rgba(196, 120, 60, 0.14);
+  color: var(--brew-caramel);
+}
+
+/* 4. Tactile Category Chips & Option Pills */
+.brew-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.brew-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  min-height: 44px;
+  border-radius: var(--brew-radius-pill);
+  background: var(--brew-alabaster);
+  border: 1px solid var(--brew-border-subtle);
+  color: var(--brew-espresso);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--brew-duration) var(--brew-ease);
+
+  &:hover {
+    background: rgba(44, 30, 22, 0.08);
+    transform: translateY(-1px);
+  }
+
+  &.is-active,
+  &.active {
+    background: var(--brew-espresso);
+    color: #FFFFFF;
+    border-color: var(--brew-espresso);
+    box-shadow: 0 4px 12px rgba(44, 30, 22, 0.2);
+  }
+}
+
+/* 5. Quantity Steppers */
+.brew-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--brew-alabaster);
+  border: 1px solid var(--brew-border-subtle);
+  border-radius: var(--brew-radius-pill);
+  padding: 3px 6px;
+
+  .brew-stepper-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border: none;
+    color: var(--brew-espresso);
+    cursor: pointer;
+    transition: background var(--brew-duration) var(--brew-ease);
+
+    &:hover {
+      background: rgba(44, 30, 22, 0.08);
+    }
+
+    &:active {
+      background: rgba(44, 30, 22, 0.16);
+    }
+
+    ion-icon {
+      font-size: 1.15rem;
+    }
+  }
+
+  .brew-stepper-val {
+    min-width: 28px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--brew-espresso);
+  }
+}
+
+/* 6. Form Inputs */
+.brew-field {
+  margin-bottom: 16px;
+
+  label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ion-color-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+
+    b,
+    .required {
+      color: var(--ion-color-danger);
+      font-weight: 700;
+      margin-left: 2px;
+    }
+  }
+
+  .brew-input,
+  input,
+  textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-family: var(--brew-font-sans);
+    font-size: 0.95rem;
+    color: var(--brew-espresso);
+    background: #FFFFFF;
+    border: 1.5px solid var(--brew-border-subtle);
+    border-radius: var(--brew-radius-md);
+    outline: none;
+    transition: border-color var(--brew-duration) var(--brew-ease), box-shadow var(--brew-duration) var(--brew-ease);
+
+    &:focus {
+      border-color: var(--brew-espresso);
+      box-shadow: 0 0 0 3px rgba(44, 30, 22, 0.1);
+    }
+
+    &::placeholder {
+      color: #A08C80;
+    }
+  }
+
+  .field-error {
+    font-size: 0.8rem;
+    color: var(--ion-color-danger);
+    margin-top: 4px;
+    font-weight: 600;
+  }
+}
+
+/* 7. Empty State */
+.brew-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  max-width: 460px;
+  margin: 24px auto;
+  background: var(--ion-card-background);
+  border: 1px solid var(--brew-border-subtle);
+  border-radius: var(--brew-radius-xl);
+  box-shadow: var(--brew-shadow-xs);
+
+  .empty-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: var(--brew-alabaster);
+    color: var(--brew-caramel);
+    display: grid;
+    place-items: center;
+    font-size: 2.2rem;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin: 0 0 20px;
+  }
+}
+
+/* 8. Skeleton Shimmer Loader */
+.brew-skeleton {
+  background: linear-gradient(90deg, #ede3d8 25%, #f7efe6 50%, #ede3d8 75%);
+  background-size: 200% 100%;
+  animation: brewShimmer 1.5s infinite;
+  border-radius: var(--brew-radius-sm);
+}
+
+@keyframes brewShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 9. Shared Brewluxe Header & Navigation */
+.brew-header {
+  background: var(--ion-background-color);
+  border-bottom: 1px solid var(--brew-border-subtle);
+}
+
+.brew-toolbar {
+  --background: var(--ion-background-color);
+  --color: var(--brew-espresso);
+  padding: 4px 8px;
+}
+
+.brew-menu-btn {
+  --color: var(--brew-espresso);
+}
+
+.brew-brand-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+
+  .header-logo {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .header-brand-name {
+    font-family: var(--brew-font-serif);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--brew-espresso);
+    letter-spacing: -0.02em;
+  }
+}
+
+.cart-nav-btn {
+  --color: var(--brew-espresso);
+  position: relative;
+  font-size: 1.35rem;
+
+  .nav-cart-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    border-radius: 50%;
+    --background: var(--brew-sage);
+    --color: #FFFFFF;
+  }
+}
+
+.explore-menu-link {
+  font-family: var(--brew-font-sans);
+  font-weight: 700;
+  font-size: 0.85rem;
+  --color: var(--brew-caramel);
+}
+
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,238 @@
+<ion-header class="ion-no-border brew-header">
+  <ion-toolbar class="brew-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/menu" text="" aria-label="Back to menu" class="brew-back-btn"></ion-back-button>
+    </ion-buttons>
+
+    <div class="brew-brand-header" routerLink="/menu">
+      <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="header-logo" />
+      <span class="header-brand-name">{{ product?.category === 'Pastries' ? 'Pastry Details' : 'Customize Drink' }}</span>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button routerLink="/cart" aria-label="View Cart" class="cart-nav-btn">
+        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+        <ion-badge *ngIf="itemCount > 0" class="nav-cart-badge">{{ itemCount }}</ion-badge>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="brew-page-shell">
+  <div class="brew-container">
+
+    <!-- Loading State -->
+    <div class="detail-loading-skeleton" *ngIf="loading">
+      <div class="brew-skeleton skeleton-detail-img"></div>
+      <div class="skeleton-detail-body">
+        <div class="brew-skeleton skeleton-line title"></div>
+        <div class="brew-skeleton skeleton-line desc"></div>
+        <div class="brew-skeleton skeleton-line desc"></div>
+      </div>
+    </div>
+
+    <!-- Main Detail Layout -->
+    <div class="detail-layout" *ngIf="!loading && product as selectedProduct">
+
+      <!-- Left Column: Product Imagery & Meta -->
+      <section class="detail-media-column">
+        <div class="detail-image-card">
+          <img
+            [src]="selectedProduct.image.toLowerCase().startsWith('http') || selectedProduct.image.toLowerCase().startsWith('data:') ? selectedProduct.image : 'assets/images/' + selectedProduct.image"
+            [alt]="selectedProduct.name"
+            loading="eager"
+            class="detail-hero-img"
+          />
+          <span class="brew-badge brew-badge-caramel detail-badge">{{ selectedProduct.category }}</span>
+        </div>
+
+        <div class="detail-info-block">
+          <div class="title-price-row">
+            <div>
+              <span class="eyebrow">{{ selectedProduct.category }} Selection</span>
+              <h1 class="product-title">{{ selectedProduct.name }}</h1>
+            </div>
+            <div class="base-price-tag">₱{{ selectedProduct.price }}</div>
+          </div>
+
+          <p class="product-description">{{ selectedProduct.description }}</p>
+
+          <div class="drink-perks-row">
+            <div class="drink-perk">
+              <ion-icon name="cafe-outline"></ion-icon>
+              <span>Freshly Crafted</span>
+            </div>
+            <div class="drink-perk">
+              <ion-icon name="sparkles-outline"></ion-icon>
+              <span>Customizable</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Interactive Customizer -->
+      <section class="detail-customizer-column">
+        <div class="customizer-card">
+          <h2 class="customizer-heading">{{ selectedProduct.category === 'Pastries' ? 'Order Fresh Pastry' : 'Customize Your Cup' }}</h2>
+          <p class="customizer-subtext" *ngIf="selectedProduct.category !== 'Pastries'">Select your preferred size, sweetness, and toppings below.</p>
+          
+          <div class="pastry-fresh-banner" *ngIf="selectedProduct.category === 'Pastries'">
+            <div class="banner-badge">🥐 Artisan Baked Daily</div>
+            <p>Crafted fresh every morning with pure European butter. Ready to enjoy immediately!</p>
+          </div>
+
+          <ng-container *ngIf="selectedProduct.category !== 'Pastries'">
+            <!-- 1. Size Selection -->
+            <div class="option-section">
+              <div class="option-header">
+                <span class="option-title">1. Cup Size</span>
+                <span class="option-selection-label">{{ size }}</span>
+              </div>
+              <div class="chips-grid">
+                <button
+                  type="button"
+                  *ngFor="let s of sizeOptions"
+                  class="brew-option-chip"
+                  [class.is-selected]="size === s"
+                  (click)="setSize(s)"
+                  [attr.aria-pressed]="size === s"
+                >
+                  <span class="chip-emoji">{{ s === 'Large' ? '🥤' : '☕' }}</span>
+                  <span class="chip-text">{{ s }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Sugar Level -->
+            <div class="option-section">
+              <div class="option-header">
+                <span class="option-title">2. Sweetness Level</span>
+                <span class="option-selection-label">{{ sugarLevel }}</span>
+              </div>
+              <div class="chips-grid-5">
+                <button
+                  type="button"
+                  *ngFor="let lvl of sugarOptions"
+                  class="brew-option-chip small"
+                  [class.is-selected]="sugarLevel === lvl"
+                  (click)="setSugar(lvl)"
+                  [attr.aria-pressed]="sugarLevel === lvl"
+                >
+                  <span class="chip-text">{{ lvl }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Ice Level -->
+            <div class="option-section">
+              <div class="option-header">
+                <span class="option-title">3. Ice Level</span>
+                <span class="option-selection-label">{{ iceLevel }}</span>
+              </div>
+              <div class="chips-grid">
+                <button
+                  type="button"
+                  *ngFor="let ice of iceOptions"
+                  class="brew-option-chip"
+                  [class.is-selected]="iceLevel === ice"
+                  (click)="setIce(ice)"
+                  [attr.aria-pressed]="iceLevel === ice"
+                >
+                  <span class="chip-emoji">❄️</span>
+                  <span class="chip-text">{{ ice }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 4. Add-ons & Extra Drizzles -->
+            <div class="option-section">
+              <div class="option-header">
+                <span class="option-title">4. Add-ons & Extra Flavors</span>
+                <span class="option-selection-label" *ngIf="selectedAddons.length">
+                  +₱{{ unitAddonsPrice }} ({{ selectedAddons.length }} selected)
+                </span>
+                <span class="option-selection-label muted" *ngIf="!selectedAddons.length">
+                  Optional
+                </span>
+              </div>
+
+              <div class="addons-list">
+                <button
+                  type="button"
+                  *ngFor="let addon of addonOptions"
+                  class="addon-row-chip"
+                  [class.is-selected]="isAddonSelected(addon.name)"
+                  (click)="toggleAddon(addon.name)"
+                  [attr.aria-pressed]="isAddonSelected(addon.name)"
+                >
+                  <div class="addon-left">
+                    <span class="addon-icon">{{ addon.icon }}</span>
+                    <span class="addon-name">{{ addon.name }}</span>
+                  </div>
+                  <div class="addon-right">
+                    <span class="addon-price">+₱{{ addon.price }}</span>
+                    <div class="addon-check-indicator">
+                      <ion-icon name="checkmark-circle-outline" *ngIf="isAddonSelected(addon.name)"></ion-icon>
+                      <span class="uncheck-dot" *ngIf="!isAddonSelected(addon.name)">+</span>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Quantity & Dynamic Action Bar -->
+          <div class="order-action-bar">
+            <div class="qty-block">
+              <span class="qty-label">Quantity</span>
+              <div class="brew-stepper">
+                <button
+                  type="button"
+                  class="brew-stepper-btn"
+                  (click)="minusQty()"
+                  [disabled]="quantity <= 1"
+                  aria-label="Decrease quantity"
+                >
+                  <ion-icon name="remove"></ion-icon>
+                </button>
+                <span class="brew-stepper-val">{{ quantity }}</span>
+                <button
+                  type="button"
+                  class="brew-stepper-btn"
+                  (click)="addQty()"
+                  aria-label="Increase quantity"
+                >
+                  <ion-icon name="add"></ion-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="submit-block">
+              <ion-button
+                expand="block"
+                class="brew-btn brew-btn-primary add-to-cart-submit"
+                (click)="addToCart()"
+              >
+                <ion-icon slot="start" name="cart-outline"></ion-icon>
+                <span>Add to Cart • ₱{{ totalPrice }}</span>
+              </ion-button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Product Not Found State -->
+    <div class="brew-empty-state" *ngIf="!loading && !product">
+      <div class="empty-icon">☕</div>
+      <h3>Drink Not Found</h3>
+      <p>The product you are looking for is currently unavailable or has been removed.</p>
+      <ion-button routerLink="/menu" class="brew-btn brew-btn-primary">
+        Browse Menu
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

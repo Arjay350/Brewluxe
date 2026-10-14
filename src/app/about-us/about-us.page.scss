@@ -1,0 +1,282 @@
+/* Top Navigation Bar */
+.brew-header {
+  background: var(--ion-background-color);
+  border-bottom: 1px solid var(--brew-border-subtle);
+}
+
+.brew-toolbar {
+  --background: var(--ion-background-color);
+  --color: var(--brew-espresso);
+  padding: 4px 8px;
+}
+
+.brew-menu-btn {
+  --color: var(--brew-espresso);
+}
+
+.brew-brand-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  .header-logo {
+    height: 38px;
+    width: auto;
+    border-radius: 8px;
+  }
+
+  .header-brand-name {
+    font-family: var(--brew-font-serif);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--brew-espresso);
+    letter-spacing: -0.02em;
+  }
+}
+
+.explore-menu-link {
+  --color: var(--brew-sage);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+/* Hero Section */
+.about-hero-section {
+  padding: 24px 0 20px;
+
+  @media (min-width: 768px) {
+    padding: 36px 0 24px;
+  }
+
+  h1 {
+    margin: 4px 0 12px;
+  }
+
+  .about-subtext {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 1rem;
+    line-height: 1.65;
+    max-width: 65ch;
+  }
+}
+
+/* Purposes Grid */
+.purposes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin: 24px 0 36px;
+}
+
+.purpose-card {
+  background: #FFFFFF;
+  border: 1px solid var(--brew-border-subtle);
+  border-radius: var(--brew-radius-lg);
+  padding: 24px 20px;
+  box-shadow: var(--brew-shadow-xs);
+  transition: transform var(--brew-duration) var(--brew-ease);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--brew-shadow-sm);
+  }
+
+  .purpose-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(42, 75, 50, 0.1);
+    color: var(--brew-sage);
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    margin-bottom: 14px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 1.15rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--ion-color-medium);
+    line-height: 1.6;
+  }
+}
+
+/* School Banner */
+.school-banner-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  background: linear-gradient(135deg, #FFFFFF, var(--brew-alabaster));
+  border: 1px solid var(--brew-border-subtle);
+  border-radius: var(--brew-radius-xl);
+  padding: 32px 28px;
+  margin-bottom: 44px;
+  box-shadow: var(--brew-shadow-sm);
+
+  .school-info-left {
+    h2 {
+      margin: 4px 0 6px;
+      font-size: 1.5rem;
+    }
+
+    .campus-title {
+      margin: 0 0 12px;
+      color: var(--ion-color-medium);
+      font-size: 0.95rem;
+    }
+
+    .section-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--brew-espresso);
+      color: #FFFFFF;
+      font-size: 0.75rem;
+      font-weight: 800;
+      border-radius: var(--brew-radius-pill);
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .school-badge-right {
+    .about-seal-logo {
+      height: 80px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 14px;
+      background: #FFFFFF;
+      padding: 6px;
+      box-shadow: var(--brew-shadow-xs);
+    }
+  }
+}
+
+/* Team Grid */
+.team-section {
+  margin-bottom: 48px;
+
+  .team-header {
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 4px 0 4px;
+    }
+
+    .team-subtext {
+      margin: 0;
+      color: var(--ion-color-medium);
+      font-size: 0.95rem;
+    }
+  }
+
+  .team-members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .member-card {
+    background: #FFFFFF;
+    border: 1px solid var(--brew-border-subtle);
+    border-radius: var(--brew-radius-xl);
+    padding: 24px 18px;
+    text-align: center;
+    box-shadow: var(--brew-shadow-xs);
+    transition: transform var(--brew-duration) var(--brew-ease), box-shadow var(--brew-duration) var(--brew-ease);
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--brew-shadow-md);
+    }
+
+    .member-photo-frame {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      margin: 0 auto 14px;
+      overflow: hidden;
+      border: 3px solid var(--brew-alabaster);
+      box-shadow: var(--brew-shadow-xs);
+      background: var(--brew-alabaster);
+
+      .member-avatar {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .member-role-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--brew-radius-pill);
+      background: rgba(196, 120, 60, 0.12);
+      color: var(--brew-caramel);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .member-name {
+      margin: 0 0 6px;
+      font-size: 1.15rem;
+      color: var(--brew-espresso);
+    }
+
+    .member-bio {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+      line-height: 1.5;
+    }
+  }
+}
+
+/* Call to Action */
+.about-cta-card {
+  background: linear-gradient(135deg, var(--brew-espresso), #3d2b20);
+  border-radius: var(--brew-radius-xl);
+  padding: 36px 28px;
+  text-align: center;
+  color: #FFFFFF;
+  margin-bottom: 60px;
+  box-shadow: var(--brew-shadow-md);
+
+  .cta-content {
+    max-width: 520px;
+    margin: 0 auto;
+
+    .eyebrow {
+      color: var(--brew-caramel);
+    }
+
+    h2 {
+      color: #FFFFFF;
+      margin: 6px 0 10px;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin: 0 0 24px;
+    }
+
+    .cta-btn {
+      --background: var(--brew-caramel);
+      --color: #FFFFFF;
+      min-width: 200px;
+      margin: 0 auto;
+    }
+  }
+}

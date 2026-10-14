@@ -1,0 +1,98 @@
+<ion-app>
+  <div class="splash-screen" *ngIf="showSplash">
+    <div class="splash-logo-wrap">
+      <div class="splash-logo">
+        <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="splash-logo-img" />
+      </div>
+      <div class="splash-copy">
+        <p class="splash-kicker">Brewluxe</p>
+        <h2>Good Drinks. Better Days.</h2>
+      </div>
+    </div>
+  </div>
+
+  <ion-menu contentId="main-content" side="start" type="overlay" menuId="brewluxe-menu">
+    <ion-header class="ion-no-border">
+      <ion-toolbar class="menu-toolbar">
+        <div class="menu-brand">
+          <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="brand-logo-img" />
+          <div class="brand-text">
+            <strong>Brewluxe</strong>
+            <small>Good Drinks. Better Days.</small>
+          </div>
+        </div>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+
+      <div class="account-panel" *ngIf="currentUser">
+        <div class="account-avatar" [attr.aria-label]="currentUser.displayName">
+          <span class="avatar-initials" *ngIf="getUserInitials()">{{ getUserInitials() }}</span>
+          <ion-icon *ngIf="!getUserInitials()" name="person-circle-outline"></ion-icon>
+        </div>
+        <div class="account-meta">
+          <strong>{{ currentUser.displayName }}</strong>
+          <span class="account-phone" *ngIf="currentUser.phone">{{ currentUser.phone }}</span>
+          <span class="account-email" *ngIf="!currentUser.phone">{{ currentUser.email }}</span>
+        </div>
+      </div>
+
+      <ion-list lines="none" class="nav-list">
+        <ng-container *ngFor="let item of menuItems">
+          <!-- Item with nested sub-items (Accordion / Dropdown) -->
+          <div *ngIf="item.children && item.children.length > 0" class="nav-group">
+            <ion-item
+              button
+              detail="false"
+              class="parent-item"
+              [class.is-expanded]="isExpanded(item.id)"
+              (click)="handleItemClick(item)"
+            >
+              <ion-icon slot="start" [name]="item.icon"></ion-icon>
+              <ion-label>{{ item.label }}</ion-label>
+              <ion-icon
+                slot="end"
+                class="submenu-toggle-icon"
+                [name]="isExpanded(item.id) ? 'chevron-down-outline' : 'chevron-forward-outline'"
+              ></ion-icon>
+            </ion-item>
+
+            <div class="submenu-container" *ngIf="isExpanded(item.id)">
+              <ion-item
+                button
+                detail="false"
+                class="submenu-item"
+                *ngFor="let child of item.children"
+                (click)="handleItemClick(child)"
+              >
+                <ion-icon slot="start" [name]="child.icon"></ion-icon>
+                <ion-label>{{ child.label }}</ion-label>
+              </ion-item>
+            </div>
+          </div>
+
+          <!-- Standard Flat Navigation Item -->
+          <ion-item
+            button
+            detail="false"
+            *ngIf="!item.children || item.children.length === 0"
+            (click)="handleItemClick(item)"
+          >
+            <ion-icon slot="start" [name]="item.icon"></ion-icon>
+            <ion-label>{{ item.label }}</ion-label>
+            <ion-badge
+              *ngIf="item.badgeKey === 'cart' && itemCount > 0"
+              slot="end"
+            >
+              {{ itemCount }}
+            </ion-badge>
+          </ion-item>
+        </ng-container>
+      </ion-list>
+
+    </ion-content>
+  </ion-menu>
+
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+</ion-app>

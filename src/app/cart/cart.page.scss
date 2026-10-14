@@ -1,0 +1,616 @@
+/* ==========================================================================
+   Cart Page Styles — Direction 1: Artisanal Roastery & Warm Hearth
+   ========================================================================== */
+
+.continue-browsing-link {
+  --color: var(--brew-sage);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+/* Page Intro */
+.cart-page-header {
+  padding: 24px 0 16px;
+
+  @media (min-width: 768px) {
+    padding: 36px 0 20px;
+  }
+
+  h1 {
+    margin: 4px 0 8px;
+  }
+
+  .cart-header-subtext {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-width: 58ch;
+  }
+}
+
+/* Empty State */
+.cart-empty-card {
+  margin: 40px auto 80px;
+
+  .browse-btn {
+    min-width: 200px;
+    margin: 0 auto;
+  }
+}
+
+/* Active Cart Layout */
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 60px;
+
+  @media (min-width: 860px) {
+    grid-template-columns: 1.35fr 0.85fr;
+    gap: 36px;
+    align-items: start;
+  }
+}
+
+/* Items Header Bar */
+.items-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 0 4px;
+
+  .items-count-label {
+    font-size: 0.92rem;
+    color: var(--ion-color-medium);
+
+    strong {
+      color: var(--brew-espresso);
+    }
+  }
+
+  .clear-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: var(--ion-color-medium);
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--brew-radius-xs);
+
+    &:hover {
+      color: var(--ion-color-danger);
+    }
+
+    ion-icon {
+      font-size: 0.95rem;
+    }
+  }
+}
+
+/* Items List */
+.cart-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cart-item-card {
+  display: flex;
+  gap: 16px;
+  background: #FFFFFF;
+  border: 1px solid var(--brew-border-subtle);
+  border-radius: var(--brew-radius-lg);
+  padding: 16px;
+  box-shadow: var(--brew-shadow-xs);
+  transition: transform var(--brew-duration) var(--brew-ease), box-shadow var(--brew-duration) var(--brew-ease);
+
+  &:hover {
+    box-shadow: var(--brew-shadow-sm);
+  }
+
+  .cart-item-thumb {
+    width: 86px;
+    height: 86px;
+    border-radius: var(--brew-radius-md);
+    overflow: hidden;
+    background: var(--brew-alabaster);
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .cart-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .cart-item-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .cart-item-name {
+    margin: 0;
+    font-family: var(--brew-font-serif);
+    font-size: 1.1rem;
+    color: var(--brew-espresso);
+  }
+
+  .cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .edit-item-btn {
+    background: var(--brew-sand, #f0e6dc);
+    border: 1px solid var(--brew-border, #ede3da);
+    color: var(--brew-forest, #2a4b32);
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all var(--brew-duration) var(--brew-ease);
+
+    &:hover {
+      background: var(--brew-forest, #2a4b32);
+      color: #ffffff;
+      border-color: var(--brew-forest, #2a4b32);
+    }
+
+    ion-icon {
+      font-size: 0.9rem;
+    }
+  }
+
+  .remove-item-btn {
+    background: transparent;
+    border: none;
+    color: #A08C80;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    transition: color var(--brew-duration) var(--brew-ease), background var(--brew-duration) var(--brew-ease);
+
+    &:hover {
+      color: var(--ion-color-danger);
+      background: rgba(198, 40, 40, 0.08);
+    }
+
+    ion-icon {
+      font-size: 1.15rem;
+    }
+  }
+
+  .cart-item-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0 4px;
+
+    .recipe-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--brew-radius-pill);
+      background: var(--brew-alabaster);
+      color: var(--brew-espresso);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  }
+
+  .cart-item-addons {
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+
+    .addons-label {
+      font-weight: 700;
+      color: var(--brew-caramel);
+      margin-right: 4px;
+    }
+
+    .addons-text {
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .cart-item-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--brew-border-subtle);
+  }
+
+  .cart-line-price {
+    font-family: var(--brew-font-sans);
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--brew-espresso);
+  }
+}
+
+/* Right Summary Column */
+.cart-summary-column {
+  @media (min-width: 860px) {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.summary-card {
+  background: #FFFFFF;
+  border: 1px solid var(--brew-border-subtle);
+  border-radius: var(--brew-radius-xl);
+  padding: 24px;
+  box-shadow: var(--brew-shadow-sm);
+
+  .summary-title {
+    margin: 0 0 18px;
+    font-size: 1.35rem;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--brew-border-subtle);
+  }
+
+  .summary-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    color: var(--ion-color-medium);
+
+    strong {
+      color: var(--brew-espresso);
+      font-weight: 700;
+    }
+
+    .delivery-hint {
+      font-size: 0.82rem;
+      color: var(--brew-sage);
+      font-weight: 600;
+    }
+
+    &.total-line {
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 2px dashed var(--brew-alabaster);
+
+      .total-label {
+        display: block;
+        font-family: var(--brew-font-serif);
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--brew-espresso);
+      }
+
+      .tax-hint {
+        display: block;
+        font-size: 0.72rem;
+        color: var(--ion-color-medium);
+      }
+
+      .total-price {
+        font-family: var(--brew-font-sans);
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--brew-espresso);
+      }
+    }
+  }
+
+  .checkout-action-btn {
+    --background: var(--brew-espresso);
+    --color: #FFFFFF;
+    min-height: 52px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+
+  .continue-btn {
+    --color: var(--brew-espresso);
+    font-weight: 700;
+    min-height: 44px;
+  }
+
+  .trust-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--brew-border-subtle);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ion-color-medium);
+
+    ion-icon {
+      color: var(--brew-sage);
+      font-size: 1rem;
+    }
+  }
+}
+
+/* ==========================================================================
+   In-Cart Drink Customization Modal Sheet
+   ========================================================================== */
+.edit-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(44, 30, 22, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: modalFadeIn 0.25s ease;
+
+  @media (min-width: 640px) {
+    align-items: center;
+    padding: 24px;
+  }
+}
+
+.edit-modal-sheet {
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 520px;
+  max-height: 86vh;
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 -10px 40px rgba(44, 30, 22, 0.25);
+  animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @media (min-width: 640px) {
+    border-radius: 24px;
+    box-shadow: 0 20px 48px rgba(44, 30, 22, 0.3);
+  }
+
+  .sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--brew-border-subtle, #ede3da);
+
+    .sheet-eyebrow {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--brew-caramel, #c4783c);
+      margin-bottom: 2px;
+    }
+
+    h2 {
+      font-family: var(--brew-font-serif, 'Fraunces', serif);
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--brew-espresso, #2c1e16);
+      margin: 0;
+    }
+
+    .sheet-close-btn {
+      background: var(--brew-sand, #f0e6dc);
+      border: 1px solid var(--brew-border, #ede3da);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--brew-espresso, #2c1e16);
+      font-size: 1.25rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: var(--brew-caramel, #c4783c);
+        color: #ffffff;
+      }
+    }
+  }
+
+  .sheet-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    .sheet-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .sheet-section-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--brew-muted, #7c685b);
+      }
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .option-pill {
+        background: var(--brew-surface-sunken, #f8f4ee);
+        border: 1.5px solid var(--brew-border, #ede3da);
+        border-radius: 9999px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--brew-espresso, #2c1e16);
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          border-color: var(--brew-caramel, #c4783c);
+        }
+
+        &.active {
+          background: var(--brew-espresso, #2c1e16);
+          border-color: var(--brew-espresso, #2c1e16);
+          color: #ffffff;
+          box-shadow: 0 4px 12px rgba(44, 30, 22, 0.15);
+        }
+      }
+    }
+
+    .addons-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+
+      @media (min-width: 440px) {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .addon-chip {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--brew-surface-sunken, #f8f4ee);
+        border: 1.5px solid var(--brew-border, #ede3da);
+        border-radius: 12px;
+        padding: 10px 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: left;
+
+        .addon-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--brew-espresso, #2c1e16);
+
+          ion-icon {
+            font-size: 1.15rem;
+            color: var(--brew-muted, #7c685b);
+          }
+        }
+
+        .addon-price {
+          font-size: 0.8rem;
+          font-weight: 700;
+          color: var(--brew-forest, #2a4b32);
+        }
+
+        &:hover {
+          border-color: var(--brew-forest, #2a4b32);
+        }
+
+        &.active {
+          background: #edf7ed;
+          border-color: var(--brew-forest, #2a4b32);
+
+          .addon-info {
+            color: #1e4620;
+
+            ion-icon {
+              color: var(--brew-forest, #2a4b32);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .sheet-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--brew-border-subtle, #ede3da);
+    background: #faf7f4;
+
+    .sheet-price-block {
+      display: flex;
+      flex-direction: column;
+
+      .price-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--brew-muted, #7c685b);
+        letter-spacing: 0.06em;
+      }
+
+      .price-value {
+        font-family: var(--brew-font-serif, 'Fraunces', serif);
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: var(--brew-forest, #2a4b32);
+      }
+    }
+
+    .sheet-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .cancel-btn {
+        padding: 0 16px;
+        height: 44px;
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .save-draft-btn {
+        padding: 0 20px;
+        height: 44px;
+        font-size: 0.9rem;
+        font-weight: 800;
+      }
+    }
+  }
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

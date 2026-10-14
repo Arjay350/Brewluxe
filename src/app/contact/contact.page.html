@@ -1,0 +1,138 @@
+<ion-header class="ion-no-border brew-header">
+  <ion-toolbar class="brew-toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button menu="brewluxe-menu" aria-label="Open menu" class="brew-menu-btn"></ion-menu-button>
+    </ion-buttons>
+
+    <div class="brew-brand-header" routerLink="/home">
+      <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="header-logo" />
+      <span class="header-brand-name">Contact Us</span>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button routerLink="/menu" class="explore-menu-link">
+        <span>Browse Menu</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="brew-page-shell">
+  <div class="brew-container">
+
+    <div class="contact-hero">
+      <span class="eyebrow">We’d love to hear from you</span>
+      <h1>Get in Touch with Brewluxe</h1>
+      <p class="contact-subtext">
+        Have questions about our beans, need help with an order, or want to share feedback? Send our team a message.
+      </p>
+    </div>
+
+    <!-- Contact Info Cards -->
+    <div class="contact-info-grid">
+      <div *ngFor="let item of contactCards" class="contact-info-card">
+        <div class="contact-icon-box">
+          <ion-icon [name]="item.icon"></ion-icon>
+        </div>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.detail }}</p>
+      </div>
+
+      <div class="contact-info-card hours-card">
+        <div class="contact-icon-box">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <h3>Café Hours</h3>
+        <p>Mon – Sun: 8:00 AM – 9:00 PM</p>
+      </div>
+    </div>
+
+    <!-- Contact Form Section -->
+    <div class="contact-form-card">
+      <div class="form-header">
+        <span class="eyebrow">Send a message</span>
+        <h2>Leave Us a Note</h2>
+        <p>We typically respond within 24 hours.</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="contact-form">
+        <div class="form-row-2">
+          <!-- Name -->
+          <div class="brew-field">
+            <label>Your Name <b>*</b></label>
+            <input
+              type="text"
+              formControlName="name"
+              autocomplete="name"
+              placeholder="e.g. Maria Santos"
+              class="brew-input"
+            />
+            <small class="field-error" *ngIf="form.controls.name.touched && form.controls.name.invalid">
+              Please enter your name.
+            </small>
+          </div>
+
+          <!-- Email -->
+          <div class="brew-field">
+            <label>Email Address <b>*</b></label>
+            <input
+              type="email"
+              formControlName="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              class="brew-input"
+            />
+            <small class="field-error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+              Please enter a valid email address.
+            </small>
+          </div>
+        </div>
+
+        <!-- Subject -->
+        <div class="brew-field">
+          <label>Subject <b>*</b></label>
+          <input
+            type="text"
+            formControlName="subject"
+            placeholder="e.g. Order Inquiry / Catering / Feedback"
+            class="brew-input"
+          />
+          <small class="field-error" *ngIf="form.controls.subject.touched && form.controls.subject.invalid">
+            Please enter a subject.
+          </small>
+        </div>
+
+        <!-- Message -->
+        <div class="brew-field">
+          <label>Your Message <b>*</b></label>
+          <textarea
+            formControlName="message"
+            rows="5"
+            placeholder="How can we help make your coffee experience better?"
+            class="brew-input contact-textarea"
+          ></textarea>
+          <small class="field-error" *ngIf="form.controls.message.touched && form.controls.message.invalid">
+            Please write at least 10 characters.
+          </small>
+        </div>
+
+        <!-- Feedback Notice -->
+        <div class="contact-feedback-box" *ngIf="feedback" role="status">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>{{ feedback }}</span>
+        </div>
+
+        <ion-button
+          type="submit"
+          expand="block"
+          class="brew-btn brew-btn-primary submit-btn"
+          [disabled]="submitting"
+        >
+          <span *ngIf="!submitting">Send Message</span>
+          <span *ngIf="submitting">Sending your note…</span>
+        </ion-button>
+      </form>
+    </div>
+
+  </div>
+</ion-content>

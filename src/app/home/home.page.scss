@@ -1,0 +1,588 @@
+/* ==========================================================================
+   Home Page Styles — Direction 1: Artisanal Roastery & Warm Hearth
+   ========================================================================== */
+
+/* Hero Section */
+.hero-section {
+  padding: 24px 0 32px;
+
+  @media (min-width: 768px) {
+    padding: 48px 0 40px;
+  }
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+
+  @media (min-width: 900px) {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 48px;
+  }
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(196, 120, 60, 0.12);
+  border: 1px solid rgba(196, 120, 60, 0.25);
+  border-radius: var(--brew-radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brew-caramel);
+  margin-bottom: 16px;
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brew-caramel);
+  }
+}
+
+.hero-title {
+  margin: 0 0 16px;
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-weight: 800;
+  color: var(--brew-espresso);
+  line-height: 1.05;
+
+  em {
+    font-style: italic;
+    color: var(--brew-caramel);
+  }
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.65;
+  color: var(--ion-color-medium);
+  margin: 0 0 28px;
+  max-width: 52ch;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
+
+  .order-btn {
+    --background: var(--brew-espresso);
+    --color: #FFFFFF;
+    min-width: 180px;
+  }
+}
+
+.hero-perks {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ion-color-medium);
+
+  .perk-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    ion-icon {
+      font-size: 1.1rem;
+      color: var(--brew-sage);
+    }
+  }
+
+  .perk-divider {
+    opacity: 0.35;
+  }
+}
+
+/* Hero Visual Card */
+.hero-visual {
+  display: flex;
+  justify-content: center;
+
+  .hero-card {
+    width: 100%;
+    max-width: 380px;
+    background: #FFFFFF;
+    border-radius: var(--brew-radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--brew-border-subtle);
+    box-shadow: var(--brew-shadow-lg);
+    transform: rotate(-1deg);
+    transition: transform var(--brew-duration) var(--brew-ease);
+
+    &:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+  }
+
+  .hero-image-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--brew-alabaster);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .hero-card-tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(44, 30, 22, 0.85);
+    backdrop-filter: blur(8px);
+    color: #FFFFFF;
+    padding: 6px 12px;
+    border-radius: var(--brew-radius-pill);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .hero-card-footer {
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #FFFFFF;
+
+    strong {
+      display: block;
+      font-family: var(--brew-font-serif);
+      font-size: 1.25rem;
+      color: var(--brew-espresso);
+    }
+
+    .hero-card-meta {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+      margin-top: 2px;
+    }
+
+    .hero-card-price {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--brew-sage);
+    }
+  }
+}
+
+/* Weather Drink Recommender Section */
+.weather-section {
+  margin: 10px 0 28px;
+  cursor: pointer;
+
+  .weather-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #FFFFFF, var(--brew-alabaster));
+    border: 1px solid rgba(196, 120, 60, 0.25);
+    border-radius: var(--brew-radius-lg);
+    box-shadow: var(--brew-shadow-sm);
+    transition: transform var(--brew-duration) var(--brew-ease), box-shadow var(--brew-duration) var(--brew-ease);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--brew-shadow-md);
+      border-color: var(--brew-caramel);
+    }
+  }
+
+  .weather-icon-box {
+    font-size: 2.2rem;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: #FFFFFF;
+    box-shadow: var(--brew-shadow-xs);
+    flex-shrink: 0;
+  }
+
+  .weather-info {
+    flex: 1;
+  }
+
+  .weather-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .weather-pill {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--brew-espresso);
+    color: #FFFFFF;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .weather-temp {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ion-color-medium);
+  }
+
+  .weather-headline {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--brew-espresso);
+  }
+
+  .weather-action-btn {
+    --color: var(--brew-espresso);
+    font-weight: 700;
+    font-size: 0.88rem;
+    flex-shrink: 0;
+  }
+}
+
+/* Common Section Blocks */
+.section-block {
+  margin: 36px 0;
+
+  @media (min-width: 768px) {
+    margin: 52px 0;
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+
+  &.center {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  h2 {
+    margin: 4px 0 0;
+  }
+
+  .section-link {
+    color: var(--brew-sage);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: color var(--brew-duration) var(--brew-ease);
+
+    &:hover {
+      color: var(--brew-espresso);
+      text-decoration: underline;
+    }
+  }
+}
+
+/* Category Chips Strip */
+.category-chips-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--brew-radius-pill);
+    background: #FFFFFF;
+    border: 1px solid var(--brew-border-subtle);
+    color: var(--brew-espresso);
+    font-weight: 700;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: var(--brew-shadow-xs);
+    transition: all var(--brew-duration) var(--brew-ease);
+
+    &:hover {
+      background: var(--brew-espresso);
+      color: #FFFFFF;
+      border-color: var(--brew-espresso);
+      transform: translateY(-2px);
+      box-shadow: var(--brew-shadow-sm);
+    }
+
+    .cat-icon {
+      font-size: 1.15rem;
+    }
+  }
+}
+
+/* Search Bar */
+.search-wrap {
+  margin-bottom: 24px;
+
+  .brew-searchbar {
+    --background: #FFFFFF;
+    --color: var(--brew-espresso);
+    --placeholder-color: #8D7668;
+    --icon-color: var(--brew-espresso);
+    --border-radius: var(--brew-radius-pill);
+    --box-shadow: var(--brew-shadow-sm);
+    padding: 0;
+  }
+}
+
+/* Products Grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.add-mini-btn {
+  --border-radius: var(--brew-radius-sm);
+  min-height: 36px;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+/* Skeleton Loading Cards */
+.skeleton-card {
+  pointer-events: none;
+
+  .skeleton-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+
+  .skeleton-title {
+    height: 18px;
+    width: 70%;
+    margin-bottom: 8px;
+  }
+
+  .skeleton-desc {
+    height: 12px;
+    width: 90%;
+    margin-bottom: 6px;
+
+    &.short {
+      width: 50%;
+    }
+  }
+
+  .skeleton-btn {
+    height: 36px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: var(--brew-radius-sm);
+  }
+}
+
+.error-banner {
+  padding: 14px 18px;
+  border-radius: var(--brew-radius-md);
+  background: #FDEDED;
+  border: 1px solid #F5C6CB;
+  color: var(--ion-color-danger);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* Values Grid */
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.value-card {
+  background: #FFFFFF;
+  border: 1px solid var(--brew-border-subtle);
+  border-radius: var(--brew-radius-lg);
+  padding: 24px 20px;
+  box-shadow: var(--brew-shadow-xs);
+  transition: transform var(--brew-duration) var(--brew-ease), box-shadow var(--brew-duration) var(--brew-ease);
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--brew-shadow-sm);
+  }
+
+  .value-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(42, 75, 50, 0.1);
+    color: var(--brew-sage);
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    font-family: var(--brew-font-serif);
+    font-size: 1.15rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+}
+
+/* Story Section */
+.story-section {
+  .story-box {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+    align-items: center;
+    padding: 32px 24px;
+    background: linear-gradient(135deg, #FFFFFF 0%, var(--brew-alabaster) 100%);
+    border: 1px solid var(--brew-border-subtle);
+    border-radius: var(--brew-radius-xl);
+    box-shadow: var(--brew-shadow-sm);
+
+    @media (min-width: 768px) {
+      grid-template-columns: 1.3fr 0.7fr;
+      padding: 44px 40px;
+    }
+  }
+
+  .story-text {
+    h2 {
+      margin: 8px 0 14px;
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin: 0 0 24px;
+    }
+  }
+
+  .story-badge-wrap {
+    display: flex;
+    justify-content: center;
+
+    .story-logo-img {
+      max-width: 200px;
+      height: auto;
+      border-radius: var(--brew-radius-lg);
+      box-shadow: var(--brew-shadow-md);
+      background: #FFFFFF;
+      padding: 12px;
+    }
+  }
+}
+
+/* Hours & Location Strip */
+.hours-location-section {
+  .info-strip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .info-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 22px;
+    background: #FFFFFF;
+    border: 1px solid var(--brew-border-subtle);
+    border-radius: var(--brew-radius-lg);
+    box-shadow: var(--brew-shadow-xs);
+
+    .info-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--brew-alabaster);
+      color: var(--brew-espresso);
+      display: grid;
+      place-items: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    h3 {
+      margin: 0 0 2px;
+      font-size: 1rem;
+      font-family: var(--brew-font-serif);
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+    }
+
+    strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.92rem;
+      color: var(--brew-espresso);
+    }
+
+    .info-link {
+      display: inline-block;
+      margin-top: 4px;
+      color: var(--brew-sage);
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

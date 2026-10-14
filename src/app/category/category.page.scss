@@ -1,0 +1,150 @@
+/* Top Navigation Bar */
+.brew-header {
+  background: var(--ion-background-color);
+  border-bottom: 1px solid var(--brew-border-subtle);
+}
+
+.brew-toolbar {
+  --background: var(--ion-background-color);
+  --color: var(--brew-espresso);
+  padding: 4px 8px;
+}
+
+.brew-menu-btn {
+  --color: var(--brew-espresso);
+}
+
+.brew-brand-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+
+  .header-logo {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .header-brand-name {
+    font-family: var(--brew-font-serif);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--brew-espresso);
+    letter-spacing: -0.02em;
+  }
+}
+
+.cart-nav-btn {
+  --color: var(--brew-espresso);
+  position: relative;
+  font-size: 1.35rem;
+
+  .nav-cart-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    border-radius: 50%;
+    --background: var(--brew-sage);
+    --color: #FFFFFF;
+  }
+}
+
+.category-hero {
+  padding: 24px 0 20px;
+
+  .category-nav-back {
+    margin-bottom: 12px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--brew-sage);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--brew-espresso);
+      text-decoration: underline;
+    }
+  }
+
+  h1 {
+    margin: 4px 0 8px;
+  }
+
+  .category-subtext {
+    margin: 0;
+    color: var(--ion-color-medium);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 58ch;
+  }
+}
+
+.category-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin-bottom: 48px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.category-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.add-cat-btn {
+  --border-radius: var(--brew-radius-sm);
+  min-height: 36px;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+/* Skeleton Loading */
+.skeleton-card {
+  pointer-events: none;
+
+  .skeleton-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+
+  .skeleton-title {
+    height: 18px;
+    width: 70%;
+    margin-bottom: 8px;
+  }
+
+  .skeleton-desc {
+    height: 12px;
+    width: 90%;
+    margin-bottom: 6px;
+
+    &.short {
+      width: 50%;
+    }
+  }
+
+  .skeleton-btn {
+    height: 36px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: var(--brew-radius-sm);
+  }
+}

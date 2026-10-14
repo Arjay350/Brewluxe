@@ -1,0 +1,176 @@
+<ion-header class="ion-no-border brew-header">
+  <ion-toolbar class="brew-toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button menu="brewluxe-menu" aria-label="Open menu" class="brew-menu-btn"></ion-menu-button>
+    </ion-buttons>
+
+    <div class="brew-brand-header" routerLink="/home">
+      <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="header-logo" />
+      <span class="header-brand-name">Brewluxe Menu</span>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button routerLink="/cart" aria-label="View Cart" class="cart-nav-btn">
+        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
+        <ion-badge *ngIf="itemCount > 0" class="nav-cart-badge">{{ itemCount }}</ion-badge>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="brew-page-shell">
+  <div class="brew-container">
+
+    <!-- Page Intro -->
+    <div class="menu-intro">
+      <span class="eyebrow">Artisanal Selection • Crafted Daily</span>
+      <h1>Choose Your Mood</h1>
+      <p class="menu-subtext">
+        From bold dark-roast espresso to sweet boba teas and flaky pastries, every item is freshly prepared with quality ingredients.
+      </p>
+    </div>
+
+    <!-- Barista Special / Weather Drink Recommender Strip -->
+    <section class="weather-section" *ngIf="weather" (click)="filterByWeather()" role="button" tabindex="0" (keydown.enter)="filterByWeather()">
+      <div class="weather-card" [class.is-recommended-active]="selectedCategory === weather.recommendedCategory">
+        <div class="weather-icon-box">{{ weather.icon }}</div>
+        <div class="weather-info">
+          <div class="weather-meta">
+            <span class="weather-pill">{{ weather.tag }}</span>
+            <span class="weather-temp">{{ weather.temperature }}°C · {{ weather.conditionText }}</span>
+          </div>
+          <p class="weather-headline">{{ weather.headline }}</p>
+        </div>
+        <ion-button fill="clear" class="weather-action-btn" (click)="$event.stopPropagation(); filterByWeather()">
+          <span>{{ selectedCategory === weather.recommendedCategory ? 'Showing Picks' : 'View Picks' }}</span>
+          <ion-icon slot="end" name="chevron-forward"></ion-icon>
+        </ion-button>
+      </div>
+    </section>
+
+    <!-- Sticky Filters & Search Section -->
+    <div class="filter-sticky-bar">
+      <!-- Search Input -->
+      <div class="menu-search-wrap">
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          placeholder="Search drinks, flavors, pastries…"
+          aria-label="Search menu items"
+          [debounce]="150"
+          show-clear-button="always"
+          class="menu-searchbar"
+        ></ion-searchbar>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="category-pills-bar">
+        <button
+          *ngFor="let cat of categories"
+          class="menu-chip"
+          [class.is-active]="selectedCategory === cat"
+          (click)="selectCategory(cat)"
+          [attr.aria-pressed]="selectedCategory === cat"
+        >
+          <span class="chip-icon" [ngSwitch]="cat">
+            <span *ngSwitchCase="'All'">✨</span>
+            <span *ngSwitchCase="'Coffee'">☕</span>
+            <span *ngSwitchCase="'Iced Coffee'">🧊</span>
+            <span *ngSwitchCase="'Frappes'">❄️</span>
+            <span *ngSwitchCase="'Pastries'">🥐</span>
+            <span *ngSwitchCase="'Shakes'">🥤</span>
+            <span *ngSwitchCase="'Non-Coffee'">🍵</span>
+          </span>
+          <span class="chip-name">{{ cat }}</span>
+          <span class="chip-count" *ngIf="products.length">{{ getCategoryCount(cat) }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Filter Summary -->
+    <div class="filter-status-row" *ngIf="selectedCategory !== 'All' || searchQuery">
+      <span class="status-text">
+        Showing <strong>{{ visibleProducts.length }}</strong> item{{ visibleProducts.length === 1 ? '' : 's' }}
+        <span *ngIf="selectedCategory !== 'All'"> in <strong>{{ selectedCategory }}</strong></span>
+        <span *ngIf="searchQuery"> matching "<strong>{{ searchQuery }}</strong>"</span>
+      </span>
+      <button class="reset-filter-btn" (click)="resetFilters()">
+        <span>Reset filters</span>
+        <ion-icon name="close-circle-outline"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Loading Skeleton Cards -->
+    <div class="menu-products-grid" *ngIf="loading">
+      <div class="brew-card skeleton-card" *ngFor="let n of [1,2,3,4,5,6]">
+        <div class="brew-skeleton skeleton-img"></div>
+        <div class="brew-card-content">
+          <div class="brew-skeleton skeleton-title"></div>
+          <div class="brew-skeleton skeleton-desc"></div>
+          <div class="brew-skeleton skeleton-desc short"></div>
+          <div class="brew-skeleton skeleton-btn"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-banner" *ngIf="productError" role="alert">
+      <p>{{ productError }}</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="menu-products-grid" *ngIf="!loading && visibleProducts.length">
+      <article
+        *ngFor="let product of visibleProducts"
+        class="brew-card"
+        (click)="openProduct(product)"
+        tabindex="0"
+        [attr.aria-label]="product.name + ' - ₱' + product.price"
+      >
+        <div class="brew-card-image-wrap">
+          <img
+            [src]="product.image.toLowerCase().startsWith('http') || product.image.toLowerCase().startsWith('data:') ? product.image : 'assets/images/' + product.image"
+            [alt]="product.name"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="brew-badge brew-badge-caramel menu-card-badge">{{ product.category }}</span>
+        </div>
+
+        <div class="brew-card-content">
+          <div class="card-title-row">
+            <h3 class="brew-card-title">{{ product.name }}</h3>
+          </div>
+          <p class="brew-card-desc">{{ product.description }}</p>
+
+          <div class="brew-card-bottom">
+            <span class="brew-price">₱{{ product.price }}</span>
+            <div class="card-btn-group">
+              <ion-button
+                size="small"
+                class="brew-btn brew-btn-primary add-menu-btn"
+                (click)="$event.stopPropagation(); addToCart(product)"
+                aria-label="Add to cart"
+              >
+                <ion-icon slot="start" name="add-outline"></ion-icon>
+                <span>Add</span>
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Empty State -->
+    <div class="brew-empty-state" *ngIf="!loading && !visibleProducts.length">
+      <div class="empty-icon">☕</div>
+      <h3>No items found</h3>
+      <p>
+        {{ searchQuery ? 'No drinks or pastries match "' + searchQuery + '".' : 'There are currently no items in ' + selectedCategory + '.' }}
+      </p>
+      <ion-button class="brew-btn brew-btn-primary" (click)="resetFilters()">
+        Show All Drinks ({{ products.length }})
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

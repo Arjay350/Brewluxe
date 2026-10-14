@@ -1,0 +1,166 @@
+/**
+ * Brewluxe Design System Tokens
+ * Direction 1: Artisanal Roastery & Warm Hearth
+ * Built with Ionic CSS Custom Properties
+ */
+
+:root {
+  /* ==========================================================================
+     Brewluxe Brand Tokens
+     ========================================================================== */
+  --brew-font-serif: 'Fraunces', Georgia, serif;
+  --brew-font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Brand Colors */
+  --brew-espresso: #2C1E16;
+  --brew-espresso-rgb: 44, 30, 22;
+  --brew-sage: #2A4B32;
+  --brew-sage-rgb: 42, 75, 50;
+  --brew-caramel: #C4783C;
+  --brew-caramel-rgb: 196, 120, 60;
+  --brew-cream: #FBF7F2;
+  --brew-cream-rgb: 251, 247, 242;
+  --brew-alabaster: #F5EDE4;
+  --brew-umber: #755647;
+
+  /* Surface & Border Tokens */
+  --brew-border-subtle: rgba(44, 30, 22, 0.08);
+  --brew-border-strong: rgba(44, 30, 22, 0.16);
+
+  /* Radius Tokens */
+  --brew-radius-xs: 6px;
+  --brew-radius-sm: 10px;
+  --brew-radius-md: 16px;
+  --brew-radius-lg: 24px;
+  --brew-radius-xl: 32px;
+  --brew-radius-pill: 999px;
+
+  /* Shadow Elevation System */
+  --brew-shadow-xs: 0 1px 3px rgba(44, 30, 22, 0.04);
+  --brew-shadow-sm: 0 4px 14px rgba(44, 30, 22, 0.06);
+  --brew-shadow-md: 0 10px 28px rgba(44, 30, 22, 0.08);
+  --brew-shadow-lg: 0 18px 42px rgba(44, 30, 22, 0.12);
+
+  /* Micro-interaction Tokens */
+  --brew-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --brew-duration: 0.22s;
+
+  /* ==========================================================================
+     Ionic Core Tokens (Light Theme)
+     ========================================================================== */
+  --ion-font-family: var(--brew-font-sans);
+
+  /* Primary: Deep Roasted Espresso */
+  --ion-color-primary: #2C1E16;
+  --ion-color-primary-rgb: 44, 30, 22;
+  --ion-color-primary-contrast: #FFFFFF;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #271A13;
+  --ion-color-primary-tint: #41342D;
+
+  /* Secondary: Sage Leaf Green */
+  --ion-color-secondary: #2A4B32;
+  --ion-color-secondary-rgb: 42, 75, 50;
+  --ion-color-secondary-contrast: #FFFFFF;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #25422C;
+  --ion-color-secondary-tint: #3F5D47;
+
+  /* Tertiary: Caramel Honey */
+  --ion-color-tertiary: #C4783C;
+  --ion-color-tertiary-rgb: 196, 120, 60;
+  --ion-color-tertiary-contrast: #FFFFFF;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #AD6A35;
+  --ion-color-tertiary-tint: #CA8650;
+
+  /* Success */
+  --ion-color-success: #2E7D32;
+  --ion-color-success-rgb: 46, 125, 50;
+  --ion-color-success-contrast: #FFFFFF;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #286E2C;
+  --ion-color-success-tint: #438A47;
+
+  /* Warning */
+  --ion-color-warning: #E65100;
+  --ion-color-warning-rgb: 230, 81, 0;
+  --ion-color-warning-contrast: #FFFFFF;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #CA4700;
+  --ion-color-warning-tint: #E8621A;
+
+  /* Danger */
+  --ion-color-danger: #C62828;
+  --ion-color-danger-rgb: 198, 40, 40;
+  --ion-color-danger-contrast: #FFFFFF;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #AE2323;
+  --ion-color-danger-tint: #CC3E3E;
+
+  /* Medium: Roasted Umber */
+  --ion-color-medium: #755647;
+  --ion-color-medium-rgb: 117, 86, 71;
+  --ion-color-medium-contrast: #FFFFFF;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #674C3E;
+  --ion-color-medium-tint: #836759;
+
+  /* Light: Warm Alabaster */
+  --ion-color-light: #F5EDE4;
+  --ion-color-light-rgb: 245, 237, 228;
+  --ion-color-light-contrast: #2C1E16;
+  --ion-color-light-contrast-rgb: 44, 30, 22;
+  --ion-color-light-shade: #D8D1C9;
+  --ion-color-light-tint: #F6EFE7;
+
+  /* Backgrounds & Text */
+  --ion-background-color: #FBF7F2;
+  --ion-background-color-rgb: 251, 247, 242;
+  --ion-text-color: #2C1E16;
+  --ion-text-color-rgb: 44, 30, 22;
+
+  --ion-card-background: #FFFFFF;
+  --ion-item-background: transparent;
+  --ion-toolbar-background: #F5EDE4;
+  --ion-toolbar-color: #2C1E16;
+}
+
+/* ==========================================================================
+   Ionic Core Tokens (Dark Theme / Dark Mode)
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  body.dark,
+  :root[data-theme='dark'] {
+    --brew-border-subtle: rgba(246, 239, 233, 0.08);
+    --brew-border-strong: rgba(246, 239, 233, 0.16);
+
+    --ion-background-color: #16110E;
+    --ion-background-color-rgb: 22, 17, 14;
+    --ion-text-color: #F6EFE9;
+    --ion-text-color-rgb: 246, 239, 233;
+
+    --ion-card-background: #241C18;
+    --ion-item-background: #1F1814;
+    --ion-toolbar-background: #1E1713;
+    --ion-toolbar-color: #F6EFE9;
+
+    --ion-color-primary: #F6EFE9;
+    --ion-color-primary-rgb: 246, 239, 233;
+    --ion-color-primary-contrast: #2C1E16;
+    --ion-color-primary-contrast-rgb: 44, 30, 22;
+
+    --ion-color-secondary: #5D8D69;
+    --ion-color-secondary-rgb: 93, 141, 105;
+
+    --ion-color-tertiary: #E28D4E;
+    --ion-color-tertiary-rgb: 226, 141, 78;
+
+    --ion-color-medium: #B8A191;
+    --ion-color-medium-rgb: 184, 161, 145;
+
+    --ion-color-light: #2A211C;
+    --ion-color-light-rgb: 42, 33, 28;
+    --ion-color-light-contrast: #F6EFE9;
+  }
+}

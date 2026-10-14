@@ -1,0 +1,305 @@
+<ion-header class="ion-no-border brew-header">
+  <ion-toolbar class="brew-toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button menu="brewluxe-menu" aria-label="Open menu" class="brew-menu-btn"></ion-menu-button>
+    </ion-buttons>
+
+    <div class="brew-brand-header" routerLink="/home">
+      <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="header-logo" />
+      <span class="header-brand-name">Your Cart</span>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button routerLink="/menu" class="continue-browsing-link">
+        <span>Menu</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="brew-page-shell">
+  <div class="brew-container">
+
+    <!-- Cart Page Header -->
+    <div class="cart-page-header">
+      <span class="eyebrow">Order Review</span>
+      <h1>Ready to Sip?</h1>
+      <p class="cart-header-subtext" *ngIf="cartItems.length">
+        Review your drinks and customizations before continuing to delivery and payment.
+      </p>
+    </div>
+
+    <!-- Empty Cart State -->
+    <div class="brew-empty-state cart-empty-card" *ngIf="cartItems.length === 0">
+      <div class="empty-icon">☕</div>
+      <h3>Your cart is empty</h3>
+      <p>
+        Looks like you haven't added any coffees, shakes, or pastries yet. Discover our fresh handcrafted menu!
+      </p>
+      <ion-button routerLink="/menu" class="brew-btn brew-btn-primary browse-btn">
+        <ion-icon slot="start" name="cafe-outline"></ion-icon>
+        <span>Explore Our Menu</span>
+      </ion-button>
+    </div>
+
+    <!-- Active Cart Layout (Desktop 2-Column Split) -->
+    <div class="cart-layout" *ngIf="cartItems.length > 0">
+
+      <!-- Left Column: Items List -->
+      <section class="cart-items-column">
+        <div class="items-header-bar">
+          <span class="items-count-label">
+            <strong>{{ totalQuantity }}</strong> item{{ totalQuantity === 1 ? '' : 's' }} in your order
+          </span>
+          <button type="button" class="clear-all-btn" (click)="confirmClearCart()">
+            <ion-icon name="trash-outline"></ion-icon>
+            <span>Clear all</span>
+          </button>
+        </div>
+
+        <div class="cart-items-list">
+          <article *ngFor="let item of cartItems; let i = index" class="cart-item-card">
+            <div class="cart-item-thumb">
+              <img
+                [src]="item.product.image.toLowerCase().startsWith('http') || item.product.image.toLowerCase().startsWith('data:') ? item.product.image : 'assets/images/' + item.product.image"
+                [alt]="item.product.name"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="cart-item-details">
+              <div class="cart-item-title-row">
+                <h3 class="cart-item-name">{{ item.product.name }}</h3>
+                <div class="cart-item-actions">
+                  <button
+                    *ngIf="item.product.category !== 'Pastries'"
+                    type="button"
+                    class="edit-item-btn"
+                    (click)="openEdit(i)"
+                    [attr.aria-label]="'Edit preferences for ' + item.product.name"
+                    title="Edit drink preferences"
+                  >
+                    <ion-icon name="create-outline"></ion-icon>
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="remove-item-btn"
+                    (click)="removeItem(i)"
+                    [attr.aria-label]="'Remove ' + item.product.name + ' from cart'"
+                    title="Remove item"
+                  >
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Recipe / Customization Pills (Drinks Only) -->
+              <div class="cart-item-options" *ngIf="item.product.category !== 'Pastries'">
+                <span class="recipe-pill">{{ item.size }}</span>
+                <span class="recipe-pill">{{ item.sugarLevel }} sugar</span>
+                <span class="recipe-pill">{{ item.iceLevel }}</span>
+              </div>
+
+              <div class="cart-item-addons" *ngIf="item.product.category !== 'Pastries' && item.addons && item.addons.length > 0">
+                <span class="addons-label">Add-ons:</span>
+                <span class="addons-text">{{ item.addons.join(', ') }}</span>
+              </div>
+
+              <!-- Price & Quantity Row -->
+              <div class="cart-item-bottom-row">
+                <div class="brew-stepper">
+                  <button
+                    type="button"
+                    class="brew-stepper-btn"
+                    (click)="updateQuantity(i, -1)"
+                    [attr.aria-label]="'Decrease quantity of ' + item.product.name"
+                  >
+                    <ion-icon name="remove"></ion-icon>
+                  </button>
+                  <span class="brew-stepper-val">{{ item.quantity }}</span>
+                  <button
+                    type="button"
+                    class="brew-stepper-btn"
+                    (click)="updateQuantity(i, 1)"
+                    [attr.aria-label]="'Increase quantity of ' + item.product.name"
+                  >
+                    <ion-icon name="add"></ion-icon>
+                  </button>
+                </div>
+
+                <div class="cart-line-price">
+                  ₱{{ getItemLinePrice(item) }}
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Right Column: Sticky Summary Box -->
+      <aside class="cart-summary-column">
+        <div class="summary-card">
+          <h2 class="summary-title">Order Summary</h2>
+
+          <div class="summary-lines">
+            <div class="summary-line">
+              <span>Items Subtotal</span>
+              <strong>₱{{ itemsSubtotal }}</strong>
+            </div>
+
+            <div class="summary-line" *ngIf="addons > 0">
+              <span>Add-ons & Toppings</span>
+              <strong>+₱{{ addons }}</strong>
+            </div>
+
+            <div class="summary-line">
+              <span>Delivery Fee</span>
+              <span class="delivery-hint">Calculated at checkout</span>
+            </div>
+
+            <div class="summary-line total-line">
+              <div>
+                <span class="total-label">Subtotal</span>
+                <small class="tax-hint">VAT included</small>
+              </div>
+              <strong class="total-price">₱{{ total }}</strong>
+            </div>
+          </div>
+
+          <ion-button
+            expand="block"
+            class="brew-btn brew-btn-primary checkout-action-btn"
+            routerLink="/checkout"
+          >
+            <span>Proceed to Checkout</span>
+            <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            fill="clear"
+            class="brew-btn brew-btn-outline continue-btn"
+            routerLink="/menu"
+          >
+            <span>Add More Drinks</span>
+          </ion-button>
+
+          <div class="trust-badge">
+            <ion-icon name="cafe-outline"></ion-icon>
+            <span>Freshly prepared upon order confirmation</span>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================
+       In-Cart Customization Modal / Bottom Sheet
+       ======================================================================== -->
+  <div class="edit-modal-backdrop" *ngIf="editingIndex !== null" (click)="closeEdit()">
+    <div class="edit-modal-sheet" (click)="$event.stopPropagation()">
+
+      <div class="sheet-header">
+        <div class="sheet-title-group">
+          <span class="sheet-eyebrow">Customize Your Drink</span>
+          <h2>{{ currentEditingItem?.product?.name }}</h2>
+        </div>
+        <button type="button" class="sheet-close-btn" (click)="closeEdit()" aria-label="Close edit">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="sheet-body" *ngIf="editDraft">
+        <!-- Size Selector -->
+        <div class="sheet-section">
+          <label class="sheet-section-label">Cup Size</label>
+          <div class="pill-group">
+            <button
+              type="button"
+              *ngFor="let size of sizeOptions"
+              class="option-pill"
+              [class.active]="editDraft.size === size"
+              (click)="selectSize(size)"
+            >
+              {{ size }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Sweetness Level (for beverages) -->
+        <div class="sheet-section" *ngIf="!isPastry">
+          <label class="sheet-section-label">Sweetness / Sugar Level</label>
+          <div class="pill-group">
+            <button
+              type="button"
+              *ngFor="let sugar of sugarOptions"
+              class="option-pill"
+              [class.active]="editDraft.sugarLevel === sugar"
+              (click)="selectSugar(sugar)"
+            >
+              {{ sugar }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Ice Level (for beverages) -->
+        <div class="sheet-section" *ngIf="!isPastry">
+          <label class="sheet-section-label">Ice Level</label>
+          <div class="pill-group">
+            <button
+              type="button"
+              *ngFor="let ice of iceOptions"
+              class="option-pill"
+              [class.active]="editDraft.iceLevel === ice"
+              (click)="selectIce(ice)"
+            >
+              {{ ice }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Add-ons Selection -->
+        <div class="sheet-section">
+          <label class="sheet-section-label">Gourmet Add-ons & Toppings</label>
+          <div class="addons-grid">
+            <button
+              type="button"
+              *ngFor="let addon of addonOptions"
+              class="addon-chip"
+              [class.active]="hasAddon(addon.name)"
+              (click)="toggleAddon(addon.name)"
+            >
+              <div class="addon-info">
+                <ion-icon [name]="hasAddon(addon.name) ? 'checkmark-circle-outline' : 'add'"></ion-icon>
+                <span class="addon-title">{{ addon.name }}</span>
+              </div>
+              <span class="addon-price">+₱{{ addon.price }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sheet Footer with Updated Price & Save Button -->
+      <div class="sheet-footer">
+        <div class="sheet-price-block">
+          <span class="price-label">Price per cup</span>
+          <span class="price-value">₱{{ draftSinglePrice }}</span>
+        </div>
+
+        <div class="sheet-actions">
+          <button type="button" class="brew-btn brew-btn-outline cancel-btn" (click)="closeEdit()">
+            Cancel
+          </button>
+          <button type="button" class="brew-btn brew-btn-primary save-draft-btn" (click)="saveEdit()">
+            Update Drink
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</ion-content>

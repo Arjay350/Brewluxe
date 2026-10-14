@@ -1,0 +1,106 @@
+<ion-header class="ion-no-border brew-header">
+  <ion-toolbar class="brew-toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button menu="brewluxe-menu" aria-label="Open menu" class="brew-menu-btn"></ion-menu-button>
+    </ion-buttons>
+
+    <div class="brew-brand-header" routerLink="/home">
+      <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="header-logo" />
+      <span class="header-brand-name">About Us</span>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button routerLink="/menu" class="explore-menu-link">
+        <span>Browse Menu</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="brew-page-shell">
+  <div class="brew-container">
+
+    <!-- About Header -->
+    <div class="about-hero-section">
+      <span class="eyebrow">Our Story & Mission</span>
+      <h1>Our Coffee Shop, Our Project, Our Teamwork</h1>
+      <p class="about-subtext">
+        Brewluxe is an artisanal coffee shop web application developed by 3rd-year Information Technology students from Technological Institute of the Philippines - Quezon City. We fused real-world web development with the comforting warmth of local café culture.
+      </p>
+    </div>
+
+    <!-- Purpose Cards Grid -->
+    <div class="purposes-grid">
+      <div class="purpose-card">
+        <div class="purpose-icon-box">
+          <ion-icon name="cafe"></ion-icon>
+        </div>
+        <h3>Our Purpose</h3>
+        <p>To design an intuitive, mouth-watering ordering experience that feels like a real boutique café while refining our full-stack engineering skills.</p>
+      </div>
+
+      <div class="purpose-card">
+        <div class="purpose-icon-box">
+          <ion-icon name="people"></ion-icon>
+        </div>
+        <h3>Our Goal</h3>
+        <p>To build a fast, responsive, and accessible digital platform that demonstrates teamwork, creative design, and production-grade software standards.</p>
+      </div>
+
+      <div class="purpose-card">
+        <div class="purpose-icon-box">
+          <ion-icon name="star"></ion-icon>
+        </div>
+        <h3>How We Built It</h3>
+        <p>We collaborated across UI design, Angular/Ionic architecture, live weather integrations, address geolocation, and secure payment sandbox testing.</p>
+      </div>
+    </div>
+
+    <!-- University & Class Banner -->
+    <div class="school-banner-card">
+      <div class="school-info-left">
+        <span class="eyebrow">Student Creators Profile</span>
+        <h2>Technological Institute of the Philippines</h2>
+        <p class="campus-title">Quezon City Campus • College of Information Technology</p>
+        <span class="section-tag">Section: IT31S1</span>
+      </div>
+      <div class="school-badge-right">
+        <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Seal" class="about-seal-logo" />
+      </div>
+    </div>
+
+    <!-- Meet the Team Grid -->
+    <section class="team-section">
+      <div class="team-header">
+        <span class="eyebrow">Meet The Creators</span>
+        <h2>Developers Behind Brewluxe</h2>
+        <p class="team-subtext">Passionate IT students crafting digital solutions with care.</p>
+      </div>
+
+      <div class="team-members-grid">
+        <div *ngFor="let member of teamMembers" class="member-card">
+          <div class="member-photo-frame">
+            <img [src]="'assets/images/team/' + member.image" [alt]="member.name" class="member-avatar" />
+          </div>
+          <span class="member-role-badge">{{ member.role }}</span>
+          <h3 class="member-name">{{ member.name }}</h3>
+          <p class="member-bio">{{ member.description }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action Card -->
+    <div class="about-cta-card">
+      <div class="cta-content">
+        <span class="eyebrow">Ready for a cup?</span>
+        <h2>Explore the Brewluxe Menu</h2>
+        <p>Taste the drinks and pastries we built this platform for.</p>
+        <ion-button routerLink="/menu" class="brew-btn brew-btn-primary cta-btn">
+          <span>Browse All Drinks</span>
+          <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

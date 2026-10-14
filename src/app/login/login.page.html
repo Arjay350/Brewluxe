@@ -1,0 +1,105 @@
+<ion-header class="ion-no-border brew-header">
+  <ion-toolbar class="brew-toolbar">
+    <div class="brew-brand-header" routerLink="/home">
+      <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="header-logo" />
+      <span class="header-brand-name">Sign In</span>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button routerLink="/menu" class="explore-link">
+        <span>Browse Menu</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="brew-page-shell login-page">
+  <div class="brew-container">
+    <div class="login-shell">
+
+      <div class="brand-badge-center">
+        <img src="assets/images/brewluxe-logo.png" alt="Brewluxe Logo" class="login-brand-logo" />
+      </div>
+
+      <div class="login-header-text">
+        <span class="eyebrow">Welcome to Brewluxe</span>
+        <h1 class="login-title">Sign In to Your Account</h1>
+        <p class="subtitle">Access your past orders, profile, and track live preparations.</p>
+      </div>
+
+      <!-- Verification Notice Banner -->
+      <div class="verification-banner" *ngIf="registeredNotice">
+        <div class="banner-icon-wrap">
+          <ion-icon name="mail-open-outline"></ion-icon>
+        </div>
+        <div class="banner-text">
+          <strong>Check Your Email</strong>
+          <p>We've sent a verification link to your inbox. Please confirm it before signing in.</p>
+        </div>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <!-- Email Field -->
+        <div class="brew-field">
+          <label>Email Address <span class="required-indicator">*</span></label>
+          <input
+            type="email"
+            formControlName="identifier"
+            autocomplete="email"
+            placeholder="you@example.com"
+            class="brew-input"
+          />
+          <small class="field-error" *ngIf="loginForm.get('identifier')?.touched && loginForm.get('identifier')?.invalid">
+            Please enter a valid email address.
+          </small>
+        </div>
+
+        <!-- Password Field -->
+        <div class="brew-field password-field-wrap">
+          <label>Password <span class="required-indicator">*</span></label>
+          <div class="password-input-group">
+            <input
+              formControlName="password"
+              [type]="showPassword ? 'text' : 'password'"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              class="brew-input"
+            />
+            <button
+              type="button"
+              class="password-toggle-btn"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </button>
+          </div>
+          <small class="field-error" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+            Password must be at least 6 characters.
+          </small>
+        </div>
+
+        <!-- Error Message -->
+        <div class="form-error-alert" *ngIf="loginError" role="alert">
+          <p>{{ loginError }}</p>
+        </div>
+
+        <!-- Submit Button -->
+        <ion-button
+          type="submit"
+          class="brew-btn brew-btn-primary login-submit-btn"
+          expand="block"
+          [disabled]="isSubmitting"
+        >
+          <span *ngIf="!isSubmitting">Sign In</span>
+          <span *ngIf="isSubmitting">Signing in…</span>
+        </ion-button>
+      </form>
+
+      <div class="login-footer">
+        <p>New to Brewluxe? <a routerLink="/register" class="register-link">Create an account</a></p>
+      </div>
+
+    </div>
+  </div>
+</ion-content>
