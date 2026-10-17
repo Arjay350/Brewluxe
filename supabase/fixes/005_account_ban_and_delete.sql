@@ -5,6 +5,7 @@
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_banned boolean NOT NULL DEFAULT false;
 
 -- 2. Update list_brewluxe_accounts to return is_banned status
+DROP FUNCTION IF EXISTS public.list_brewluxe_accounts();
 CREATE OR REPLACE FUNCTION public.list_brewluxe_accounts()
 RETURNS TABLE (
   id uuid,
