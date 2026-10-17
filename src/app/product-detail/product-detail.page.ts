@@ -29,6 +29,7 @@ import { Subscription } from 'rxjs';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
 import { ProductService } from '../services/product.service';
+import { GuestPromptService } from '../services/guest-prompt.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -77,6 +78,7 @@ export class ProductDetailPage implements OnInit, OnDestroy {
     private cartService: CartService,
     private router: Router,
     private toastController: ToastController,
+    private guestPrompt: GuestPromptService,
   ) {
     addIcons({
       add,
@@ -165,6 +167,10 @@ export class ProductDetailPage implements OnInit, OnDestroy {
 
   async addToCart(): Promise<void> {
     if (!this.product) return;
+
+    if (!this.guestPrompt.ensureAuthenticated()) {
+      return;
+    }
 
     const isPastry = this.product.category === 'Pastries';
     const size = isPastry ? 'Standard' : this.size;

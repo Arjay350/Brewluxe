@@ -130,10 +130,12 @@ export const routes: Routes = [
   {
     path: 'cart',
     loadComponent: () => import('./cart/cart.page').then((m) => m.CartPage),
+    canActivate: [authGuard],
   },
   {
     path: 'checkout',
     loadComponent: () => import('./checkout/checkout.page').then((m) => m.CheckoutPage),
+    canActivate: [authGuard],
   },
   {
     path: 'orders',

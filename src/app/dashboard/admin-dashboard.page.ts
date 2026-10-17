@@ -25,6 +25,7 @@ import {
   checkmarkCircleOutline,
   linkOutline,
   refreshOutline,
+  createOutline,
 } from 'ionicons/icons';
 import { AuthService } from '../auth/auth.service';
 import { Product, ProductCategory, productImageUrl } from '../models/product.model';
@@ -188,8 +189,27 @@ import { ProductInput, ProductService, PRODUCT_CATEGORIES } from '../services/pr
               <small>{{ product.available ? 'Available' : 'Hidden from customers' }}{{ product.featured ? ' · Featured' : '' }}</small>
             </div>
             <div class="row-actions">
-              <ion-button size="small" fill="outline" (click)="edit(product)">Edit</ion-button>
-              <ion-button size="small" color="danger" fill="outline" (click)="remove(product)">Delete</ion-button>
+              <ion-button
+                size="small"
+                fill="outline"
+                class="catalog-btn catalog-edit-btn"
+                (click)="edit(product)"
+                aria-label="Edit product"
+              >
+                <ion-icon slot="start" name="create-outline"></ion-icon>
+                Edit
+              </ion-button>
+              <ion-button
+                size="small"
+                color="danger"
+                fill="outline"
+                class="catalog-btn catalog-delete-btn"
+                (click)="remove(product)"
+                aria-label="Delete product"
+              >
+                <ion-icon slot="start" name="trash-outline"></ion-icon>
+                Delete
+              </ion-button>
             </div>
           </article>
         </section>
@@ -352,9 +372,16 @@ import { ProductInput, ProductService, PRODUCT_CATEGORIES } from '../services/pr
       flex-wrap: wrap;
       margin-top: 0.6rem;
     }
-    ion-button {
-      --background: #30241d;
+    ion-button:not([fill="outline"]) {
+      --background: var(--brew-espresso, #30241d);
+      --color: #ffffff;
       --border-radius: 12px;
+    }
+    ion-button[fill="outline"] {
+      --background: transparent;
+      --border-radius: 12px;
+      --border-color: var(--brew-caramel, #c4783c);
+      --color: var(--brew-espresso, #2c1e16);
     }
     .catalog h2 span {
       font-size: 0.9rem;
@@ -384,8 +411,45 @@ import { ProductInput, ProductService, PRODUCT_CATEGORIES } from '../services/pr
     }
     .row-actions {
       display: flex;
-      gap: 0.2rem;
+      align-items: center;
+      gap: 0.5rem;
       flex-wrap: wrap;
+
+      .catalog-btn {
+        min-height: 44px;
+        min-width: 44px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.02em;
+
+        &:focus-visible {
+          outline: 2px solid var(--brew-caramel, #c4783c);
+          outline-offset: 2px;
+        }
+      }
+
+      .catalog-edit-btn {
+        --color: var(--brew-espresso, #2c1e16);
+        --border-color: var(--brew-caramel, #c4783c);
+        --background: #ffffff;
+        --background-hover: var(--brew-surface-sunken, #f8f4ee);
+        --border-width: 1.5px;
+
+        ion-icon {
+          font-size: 1rem;
+          color: var(--brew-caramel, #c4783c);
+        }
+      }
+
+      .catalog-delete-btn {
+        --border-width: 1.5px;
+        min-height: 44px;
+        min-width: 44px;
+
+        ion-icon {
+          font-size: 1rem;
+        }
+      }
     }
     .notice {
       padding: 0.8rem;
@@ -456,6 +520,7 @@ export class AdminDashboardPage implements OnInit {
       checkmarkCircleOutline,
       linkOutline,
       refreshOutline,
+      createOutline,
     });
   }
 

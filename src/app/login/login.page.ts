@@ -88,9 +88,14 @@ export class LoginPage implements OnInit {
 
       if (currentUser.role === 'CUSTOMER') {
         localStorage.setItem('brewluxe-show-splash', '1');
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+        if (returnUrl) {
+          await this.router.navigateByUrl(returnUrl);
+          return;
+        }
       }
 
-      this.router.navigateByUrl(this.authService.getDashboardForRole(currentUser.role));
+      await this.router.navigateByUrl(this.authService.getDashboardForRole(currentUser.role));
     } catch (error) {
       this.loginError = error instanceof Error ? error.message : 'Could not sign in. Please try again.';
       this.loginForm.patchValue({ password: '' });

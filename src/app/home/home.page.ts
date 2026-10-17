@@ -39,6 +39,7 @@ import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
 import { ProductService } from '../services/product.service';
 import { WeatherRecommendation, WeatherService } from '../services/weather.service';
+import { GuestPromptService } from '../services/guest-prompt.service';
 
 @Component({
   selector: 'app-home',
@@ -78,6 +79,7 @@ export class HomePage implements OnInit, OnDestroy {
     private weatherService: WeatherService,
     private toastCtrl: ToastController,
     private router: Router,
+    private guestPrompt: GuestPromptService,
   ) {
     addIcons({
       bag,
@@ -148,6 +150,9 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async addToCart(product: Product): Promise<void> {
+    if (!this.guestPrompt.ensureAuthenticated()) {
+      return;
+    }
     this.cartService.addToCart(product);
 
     const toast = await this.toastCtrl.create({

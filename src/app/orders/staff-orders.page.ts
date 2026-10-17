@@ -22,6 +22,7 @@ import {
   syncOutline,
   checkmarkCircleOutline,
 } from 'ionicons/icons';
+import { getNextOrderStatuses, isOrderClosed } from '../models/order-status.model';
 import { DatabaseService, OrderRecord } from '../services/database.service';
 
 @Component({
@@ -534,16 +535,11 @@ export class StaffOrdersPage implements OnInit {
   }
 
   isClosed(o: OrderRecord): boolean {
-    return o.status === 'Completed' || o.status === 'Cancelled';
+    return isOrderClosed(o.status);
   }
 
   nextStatuses(o: OrderRecord): string[] {
-    if (o.status === 'Pending') return ['Pending', 'Confirmed', 'Cancelled'];
-    if (o.status === 'Confirmed') return ['Confirmed', 'Preparing', 'Cancelled'];
-    if (o.status === 'Preparing') return ['Preparing', 'Ready'];
-    if (o.status === 'Ready') return ['Ready', 'Out for delivery', 'Completed'];
-    if (o.status === 'Out for delivery') return ['Out for delivery', 'Completed'];
-    return [o.status];
+    return getNextOrderStatuses(o.status);
   }
 
   async save(o: OrderRecord): Promise<void> {

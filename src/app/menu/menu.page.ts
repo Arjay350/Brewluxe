@@ -29,6 +29,7 @@ import {
 import { Subscription } from 'rxjs';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
+import { GuestPromptService } from '../services/guest-prompt.service';
 import { ProductService } from '../services/product.service';
 import { WeatherRecommendation, WeatherService } from '../services/weather.service';
 
@@ -72,6 +73,7 @@ export class MenuPage implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private toastCtrl: ToastController,
     private weatherService: WeatherService,
+    private guestPrompt: GuestPromptService,
   ) {
     addIcons({
       addOutline,
@@ -158,6 +160,9 @@ export class MenuPage implements OnInit, OnDestroy {
   }
 
   async addToCart(product: Product): Promise<void> {
+    if (!this.guestPrompt.ensureAuthenticated()) {
+      return;
+    }
     this.cartService.addToCart(product);
 
     const toast = await this.toastCtrl.create({

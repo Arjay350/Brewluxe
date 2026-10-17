@@ -58,8 +58,9 @@ export class AuthService {
     displayName: string,
     phone: string,
   ): Promise<boolean> {
+    const cleanEmail = email.trim().toLowerCase();
     const { data, error } = await this.supabase.auth.signUp({
-      email: email.trim(),
+      email: cleanEmail,
       password,
       options: {
         data: {
@@ -70,12 +71,16 @@ export class AuthService {
       },
     });
     if (error) throw error;
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      throw new Error('An account with this email already exists. Please sign in instead.');
+    }
     if (data.session && data.user) await this.loadAuthUser(data.user);
     return !!data.session;
   }
 
   async logout(): Promise<void> {
     localStorage.removeItem('brewluxe-demo-user');
+    localStorage.removeItem('brewluxe-cart');
     const { error } = await this.supabase.auth.signOut();
     if (error) await this.supabase.auth.signOut({ scope: 'local' });
     this.currentUserSubject.next(null);

@@ -17,6 +17,7 @@ import { addOutline, cartOutline, arrowBackOutline, checkmarkCircleOutline } fro
 import { Subscription } from 'rxjs';
 import { Product } from '../models/product.model';
 import { CartService } from '../services/cart.service';
+import { GuestPromptService } from '../services/guest-prompt.service';
 import { ProductService } from '../services/product.service';
 
 @Component({
@@ -51,6 +52,7 @@ export class CategoryPage implements OnInit, OnDestroy {
     private cartService: CartService,
     private router: Router,
     private toastCtrl: ToastController,
+    private guestPrompt: GuestPromptService,
   ) {
     addIcons({ addOutline, cartOutline, arrowBackOutline, checkmarkCircleOutline });
   }
@@ -79,6 +81,9 @@ export class CategoryPage implements OnInit, OnDestroy {
   }
 
   async addToCart(product: Product): Promise<void> {
+    if (!this.guestPrompt.ensureAuthenticated()) {
+      return;
+    }
     this.cartService.addToCart(product);
 
     const toast = await this.toastCtrl.create({

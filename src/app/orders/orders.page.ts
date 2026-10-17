@@ -174,10 +174,10 @@ interface OrderRecord {
 
                 <div class="step-line" [class.is-filled]="getStatusStep(order.status) >= 3"></div>
 
-                <!-- Step 3: Ready -->
+                <!-- Step 3: Ready / On The Way -->
                 <div class="step-point" [class.is-done]="getStatusStep(order.status) >= 3" [class.is-current]="getStatusStep(order.status) === 3">
                   <div class="step-bubble">3</div>
-                  <span class="step-text">Ready</span>
+                  <span class="step-text">{{ order.status === 'Out for delivery' ? 'On The Way' : 'Ready' }}</span>
                 </div>
 
                 <div class="step-line" [class.is-filled]="getStatusStep(order.status) >= 4"></div>

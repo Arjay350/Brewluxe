@@ -188,6 +188,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   async logout(): Promise<void> {
     try {
+      this.cartService.clearCart();
       await this.authService.logout();
     } catch {
       /* Clear local view even if remote sign-out fails */

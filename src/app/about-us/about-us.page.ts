@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonContent, IonIcon, IonButton } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { bag, briefcase, cafe, leaf, people, star, storefront } from 'ionicons/icons';
+import { arrowForwardOutline, bag, briefcase, cafe, leaf, people, star, storefront } from 'ionicons/icons';
 
 @Component({
   selector: 'app-about-us',
   templateUrl: './about-us.page.html',
   styleUrls: ['./about-us.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonContent, IonIcon, IonButton],
+  imports: [CommonModule, RouterLink, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonContent, IonIcon, IonButton],
 })
 export class AboutUsPage {
   teamMembers = [
@@ -21,6 +22,6 @@ export class AboutUsPage {
   ];
 
   constructor() {
-    addIcons({ bag, briefcase, cafe, leaf, people, star, storefront });
+    addIcons({ arrowForwardOutline, bag, briefcase, cafe, leaf, people, star, storefront });
   }
 }

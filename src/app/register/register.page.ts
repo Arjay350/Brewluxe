@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
   IonButtons,
@@ -488,6 +488,7 @@ export class RegisterPage {
     private readonly formBuilder: FormBuilder,
     private readonly auth: AuthService,
     private readonly router: Router,
+    private readonly route: ActivatedRoute,
   ) {
     addIcons({
       eyeOutline,
@@ -557,14 +558,33 @@ export class RegisterPage {
         return;
       }
       this.form.patchValue({ displayName: normalizedName, email: normalizedEmail, phone: cleanPhone });
-      const signedIn = await this.auth.register(normalizedEmail, password, normalizedName, cleanPhone);
+
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                'Registration timed out after 15 seconds. Please check your internet connection or try again.',
+              ),
+            ),
+          15000,
+        ),
+      );
+
+      const signedIn = await Promise.race([
+        this.auth.register(normalizedEmail, password, normalizedName, cleanPhone),
+        timeoutPromise,
+      ]);
+
       if (!signedIn) {
         this.registeredEmail = normalizedEmail;
         this.registrationComplete = true;
         return;
       }
+
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
       localStorage.setItem('brewluxe-show-splash', '1');
-      await this.router.navigateByUrl('/home');
+      await this.router.navigateByUrl(returnUrl);
     } catch (error) {
       this.message = error instanceof Error ? error.message : 'Could not create your account. Please try again.';
     } finally {
