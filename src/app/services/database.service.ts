@@ -19,6 +19,7 @@ export interface ManagedAccount {
   email: string;
   phone: string | null;
   role: 'SUPER_ADMIN' | 'ADMIN' | 'EMPLOYEE' | 'CUSTOMER';
+  is_banned?: boolean;
   created_at: string;
 }
 
@@ -320,9 +321,17 @@ export class DatabaseService {
   }
 
   async setAccountRole(userId: string, role: ManagedAccount['role']): Promise<void> {
-    try {
-      const { error } = await this.supabase.rpc('set_brewluxe_account_role', { p_user_id: userId, p_role: role });
-      if (!error) return;
-    } catch {}
+    const { error } = await this.supabase.rpc('set_brewluxe_account_role', { p_user_id: userId, p_role: role });
+    if (error) throw error;
+  }
+
+  async setAccountBan(userId: string, banned: boolean): Promise<void> {
+    const { error } = await this.supabase.rpc('set_brewluxe_account_ban', { p_user_id: userId, p_banned: banned });
+    if (error) throw error;
+  }
+
+  async deleteAccount(userId: string): Promise<void> {
+    const { error } = await this.supabase.rpc('delete_brewluxe_account', { p_user_id: userId });
+    if (error) throw error;
   }
 }

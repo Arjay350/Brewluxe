@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
@@ -84,6 +84,17 @@ import { AuthService } from '../auth/auth.service';
           >
             <span>Proceed to Sign In</span>
           </ion-button>
+
+          <ion-button
+            expand="block"
+            class="brew-btn brew-btn-secondary"
+            style="margin-top: 0.75rem;"
+            routerLink="/menu"
+          >
+            <ion-icon name="cafe-outline" slot="start"></ion-icon>
+            <span>Browse Full Menu</span>
+          </ion-button>
+
           <p class="subtitle resend-hint">Need to change details? <a (click)="resetForm()">Back to registration</a></p>
         </main>
 
@@ -490,6 +501,7 @@ export class RegisterPage {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly cdr: ChangeDetectorRef,
+    private readonly ngZone: NgZone,
   ) {
     addIcons({
       eyeOutline,
@@ -585,13 +597,29 @@ export class RegisterPage {
       if (!signedIn) {
         this.registeredEmail = normalizedEmail;
         this.registrationComplete = true;
+        this.submitting = false;
         this.cdr.detectChanges();
         return;
       }
 
-      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+      let targetUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+      if (targetUrl === '/register' || targetUrl === '/login') {
+        targetUrl = '/home';
+      }
       localStorage.setItem('brewluxe-show-splash', '1');
-      await this.router.navigateByUrl(returnUrl);
+      this.submitting = false;
+      this.cdr.detectChanges();
+
+      await this.ngZone.run(async () => {
+        try {
+          const success = await this.router.navigateByUrl(targetUrl);
+          if (!success) {
+            window.location.href = targetUrl;
+          }
+        } catch {
+          window.location.href = targetUrl;
+        }
+      });
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
       if (errMsg.toLowerCase().includes('rate limit') || errMsg.toLowerCase().includes('rate_limit')) {

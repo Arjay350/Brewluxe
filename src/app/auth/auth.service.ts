@@ -125,13 +125,26 @@ export class AuthService {
 
   private async loadAuthUser(user: User): Promise<void> {
     const metadata = user.user_metadata ?? {};
-    const { data } = await this.supabase
-      .from('profiles')
-      .select('role,phone,display_name')
-      .eq('id', user.id)
-      .maybeSingle();
+    let profileRole: string | undefined;
+    let profilePhone: string | undefined;
+    let profileDisplayName: string | undefined;
 
-    const profileRole = data?.['role'];
+    try {
+      const { data } = await this.supabase
+        .from('profiles')
+        .select('role,phone,display_name')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (data) {
+        profileRole = data['role'];
+        profilePhone = data['phone'];
+        profileDisplayName = data['display_name'];
+      }
+    } catch {
+      // Fallback safely to auth metadata if profile query fails
+    }
+
     const userModel: AuthUser = {
       id: user.id,
       username:
@@ -140,7 +153,7 @@ export class AuthService {
         'customer',
       email: user.email ?? '',
       phone:
-        (data?.['phone'] as string) || (metadata['phone'] as string) || '',
+        profilePhone || (metadata['phone'] as string) || '',
       role:
         profileRole === 'SUPER_ADMIN' ||
         profileRole === 'ADMIN' ||
@@ -148,7 +161,7 @@ export class AuthService {
           ? profileRole
           : 'CUSTOMER',
       displayName:
-        (data?.['display_name'] as string) ||
+        profileDisplayName ||
         (metadata['display_name'] as string) ||
         user.email?.split('@')[0] ||
         'Customer',

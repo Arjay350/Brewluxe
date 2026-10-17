@@ -3,6 +3,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
+  AlertController,
   IonButtons,
   IonContent,
   IonHeader,
@@ -23,6 +24,8 @@ import {
   lockClosedOutline,
   searchOutline,
   peopleOutline,
+  banOutline,
+  trashOutline,
 } from 'ionicons/icons';
 import { AuthService, UserRole } from '../auth/auth.service';
 import { DatabaseService, ManagedAccount } from '../services/database.service';
@@ -196,12 +199,15 @@ import { DatabaseService, ManagedAccount } from '../services/database.service';
             <div class="accounts-grid" *ngIf="paginatedCustomers.length">
               <article *ngFor="let account of paginatedCustomers" class="account-card" [class.is-self]="account.id === myUserId">
                 <div class="account-identity">
-                  <div class="user-avatar">
-                    <ion-icon name="person-outline"></ion-icon>
+                  <div class="user-avatar" [class.avatar-banned]="account.is_banned">
+                    <ion-icon [name]="account.is_banned ? 'ban-outline' : 'person-outline'"></ion-icon>
                   </div>
                   <div class="user-meta">
                     <div class="user-name-row">
                       <h3>{{ account.display_name || 'Customer' }}</h3>
+                      <span class="banned-tag" *ngIf="account.is_banned">
+                        <ion-icon name="ban-outline"></ion-icon> Banned
+                      </span>
                       <span class="self-tag" *ngIf="account.id === myUserId">
                         <ion-icon name="lock-closed-outline"></ion-icon> You
                       </span>
@@ -217,7 +223,7 @@ import { DatabaseService, ManagedAccount } from '../services/database.service';
                     <ion-select
                       [(ngModel)]="draftRoles[account.id]"
                       [name]="'role-' + account.id"
-                      [disabled]="account.id === myUserId"
+                      [disabled]="account.id === myUserId || deletingId === account.id || banningId === account.id"
                       interface="popover"
                       class="role-select"
                     >
@@ -230,10 +236,34 @@ import { DatabaseService, ManagedAccount } from '../services/database.service';
                   <button
                     type="button"
                     class="brew-btn brew-btn-primary save-role-btn"
-                    [disabled]="savingId === account.id || account.id === myUserId || draftRoles[account.id] === account.role"
+                    [disabled]="savingId === account.id || deletingId === account.id || banningId === account.id || account.id === myUserId || draftRoles[account.id] === account.role"
                     (click)="saveRole(account)"
                   >
                     {{ savingId === account.id ? 'Updating…' : 'Save Role' }}
+                  </button>
+                </div>
+
+                <!-- Account Actions: Ban / Unban & Delete User -->
+                <div class="account-actions-row" *ngIf="account.id !== myUserId">
+                  <button
+                    type="button"
+                    class="account-action-btn ban-user-btn"
+                    [class.is-banned-state]="account.is_banned"
+                    [disabled]="banningId === account.id || deletingId === account.id || savingId === account.id"
+                    (click)="toggleBan(account)"
+                  >
+                    <ion-icon [name]="account.is_banned ? 'shield-checkmark-outline' : 'ban-outline'"></ion-icon>
+                    <span>{{ banningId === account.id ? 'Updating…' : (account.is_banned ? 'Unban User' : 'Ban User') }}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="account-action-btn delete-user-btn"
+                    [disabled]="deletingId === account.id || banningId === account.id || savingId === account.id"
+                    (click)="confirmDelete(account)"
+                  >
+                    <ion-icon name="trash-outline"></ion-icon>
+                    <span>{{ deletingId === account.id ? 'Deleting…' : 'Delete User' }}</span>
                   </button>
                 </div>
               </article>
@@ -547,6 +577,11 @@ import { DatabaseService, ManagedAccount } from '../services/database.service';
             background: #fef3c7;
             color: #92400e;
           }
+
+          &.avatar-banned {
+            background: #fee2e2;
+            color: #991b1b;
+          }
         }
 
         .user-meta {
@@ -562,6 +597,20 @@ import { DatabaseService, ManagedAccount } from '../services/database.service';
               font-weight: 700;
               color: var(--brew-espresso, #2c1e16);
               margin: 0;
+            }
+
+            .banned-tag {
+              display: inline-flex;
+              align-items: center;
+              gap: 0.25rem;
+              font-size: 0.7rem;
+              font-weight: 700;
+              background: #fee2e2;
+              color: #991b1b;
+              padding: 2px 6px;
+              border-radius: 4px;
+              text-transform: uppercase;
+              letter-spacing: 0.04em;
             }
 
             .self-tag {
@@ -632,6 +681,70 @@ import { DatabaseService, ManagedAccount } from '../services/database.service';
           white-space: nowrap;
         }
       }
+
+      .account-actions-row {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding-top: 0.85rem;
+        border-top: 1px dashed var(--brew-border, #ede3da);
+
+        .account-action-btn {
+          flex: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.4rem;
+          min-height: 38px;
+          padding: 0.45rem 0.75rem;
+          border-radius: var(--brew-radius-md, 10px);
+          font-weight: 700;
+          font-size: 0.82rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: 1px solid transparent;
+
+          &:focus-visible {
+            outline: 2px solid var(--brew-caramel, #c4783c);
+            outline-offset: 2px;
+          }
+
+          &[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+
+        .ban-user-btn {
+          background: #fef3c7;
+          color: #92400e;
+          border-color: #fde68a;
+
+          &:hover:not([disabled]) {
+            background: #fde68a;
+          }
+
+          &.is-banned-state {
+            background: #edf7ed;
+            color: #1e4620;
+            border-color: #c8e6c9;
+
+            &:hover:not([disabled]) {
+              background: #dcfce7;
+            }
+          }
+        }
+
+        .delete-user-btn {
+          background: #fdf2f2;
+          color: #991b1b;
+          border-color: #fecaca;
+
+          &:hover:not([disabled]) {
+            background: #fee2e2;
+          }
+        }
+      }
     }
 
     .lockout-notice {
@@ -664,13 +777,16 @@ export class SuperAdminDashboardPage implements OnInit {
   readonly myUserId = this.auth.getCurrentUser()?.id ?? '';
 
   customerSearchQuery = '';
-  readonly customerPageSize = 10;
+  customerPageSize = 10;
   displayedCustomerCount = 10;
+  banningId?: string;
+  deletingId?: string;
 
   constructor(
     private readonly database: DatabaseService,
     private readonly auth: AuthService,
     private readonly cdr: ChangeDetectorRef,
+    private readonly alertCtrl: AlertController,
   ) {
     addIcons({
       shieldOutline,
@@ -682,6 +798,8 @@ export class SuperAdminDashboardPage implements OnInit {
       lockClosedOutline,
       searchOutline,
       peopleOutline,
+      banOutline,
+      trashOutline,
     });
   }
 
@@ -756,6 +874,99 @@ export class SuperAdminDashboardPage implements OnInit {
       this.draftRoles[account.id] = account.role;
     } finally {
       this.savingId = undefined;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async toggleBan(account: ManagedAccount): Promise<void> {
+    if (account.id === this.myUserId) return;
+    const newBannedState = !account.is_banned;
+    const actionLabel = newBannedState ? 'Ban' : 'Unban';
+
+    const alert = await this.alertCtrl.create({
+      header: `${actionLabel} Customer`,
+      subHeader: account.display_name || account.email,
+      message: newBannedState
+        ? `Are you sure you want to ban this customer? They will be locked out of signing in to Brewluxe immediately.`
+        : `Are you sure you want to unban this customer? They will regain access to their account.`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: actionLabel,
+          role: newBannedState ? 'destructive' : undefined,
+          handler: () => {
+            void this.performBan(account, newBannedState);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  private async performBan(account: ManagedAccount, banned: boolean): Promise<void> {
+    this.banningId = account.id;
+    this.message = '';
+    this.failed = false;
+    this.cdr.detectChanges();
+
+    try {
+      await this.database.setAccountBan(account.id, banned);
+      account.is_banned = banned;
+      this.message = `${account.email} has been ${banned ? 'banned' : 'unbanned'} successfully.`;
+    } catch (error) {
+      this.failed = true;
+      this.message = error instanceof Error ? error.message : `Could not ${banned ? 'ban' : 'unban'} this user.`;
+    } finally {
+      this.banningId = undefined;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async confirmDelete(account: ManagedAccount): Promise<void> {
+    if (account.id === this.myUserId) return;
+
+    const alert = await this.alertCtrl.create({
+      header: 'Delete Customer Account',
+      subHeader: account.display_name ? `${account.display_name} (${account.email})` : account.email,
+      message: 'This action is PERMANENT. It will permanently remove their profile and authentication credentials from the database. Are you sure you want to proceed?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+        },
+        {
+          text: 'Permanently Delete',
+          role: 'destructive',
+          handler: () => {
+            void this.deleteUser(account);
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  async deleteUser(account: ManagedAccount): Promise<void> {
+    this.deletingId = account.id;
+    this.message = '';
+    this.failed = false;
+    this.cdr.detectChanges();
+
+    try {
+      await this.database.deleteAccount(account.id);
+      this.accounts = this.accounts.filter((a) => a.id !== account.id);
+      delete this.draftRoles[account.id];
+      this.message = `Account for ${account.email} was permanently deleted.`;
+    } catch (error) {
+      this.failed = true;
+      this.message = error instanceof Error ? error.message : 'Could not delete this account.';
+    } finally {
+      this.deletingId = undefined;
       this.cdr.detectChanges();
     }
   }
