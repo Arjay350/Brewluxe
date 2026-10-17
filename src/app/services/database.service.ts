@@ -327,11 +327,21 @@ export class DatabaseService {
 
   async setAccountBan(userId: string, banned: boolean): Promise<void> {
     const { error } = await this.supabase.rpc('set_brewluxe_account_ban', { p_user_id: userId, p_banned: banned });
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST202' || error.message?.includes('not find the function')) {
+        throw new Error('Please run supabase/fixes/005_account_ban_and_delete.sql in your Supabase SQL Editor to install the ban function.');
+      }
+      throw error;
+    }
   }
 
   async deleteAccount(userId: string): Promise<void> {
     const { error } = await this.supabase.rpc('delete_brewluxe_account', { p_user_id: userId });
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST202' || error.message?.includes('not find the function')) {
+        throw new Error('Please run supabase/fixes/005_account_ban_and_delete.sql in your Supabase SQL Editor to install the delete function.');
+      }
+      throw error;
+    }
   }
 }
