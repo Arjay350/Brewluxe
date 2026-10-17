@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
@@ -489,6 +489,7 @@ export class RegisterPage {
     private readonly auth: AuthService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     addIcons({
       eyeOutline,
@@ -535,14 +536,18 @@ export class RegisterPage {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.message = 'Please check the required fields and enter a password of at least 8 characters with letters & numbers.';
+      this.cdr.detectChanges();
       return;
     }
     this.submitting = true;
     this.message = '';
+    this.cdr.detectChanges();
+
     try {
       const { displayName, phone, email, password, confirmPassword } = this.form.getRawValue();
       if (password !== confirmPassword) {
         this.message = 'Passwords do not match.';
+        this.cdr.detectChanges();
         return;
       }
       const normalizedName = displayName.trim();
@@ -555,6 +560,7 @@ export class RegisterPage {
       }
       if (normalizedName.length < 2 || !/^09\d{9}$/.test(cleanPhone)) {
         this.message = 'Enter a valid name and 11-digit Philippine mobile number (e.g., 09123456789).';
+        this.cdr.detectChanges();
         return;
       }
       this.form.patchValue({ displayName: normalizedName, email: normalizedEmail, phone: cleanPhone });
@@ -579,6 +585,7 @@ export class RegisterPage {
       if (!signedIn) {
         this.registeredEmail = normalizedEmail;
         this.registrationComplete = true;
+        this.cdr.detectChanges();
         return;
       }
 
@@ -586,9 +593,16 @@ export class RegisterPage {
       localStorage.setItem('brewluxe-show-splash', '1');
       await this.router.navigateByUrl(returnUrl);
     } catch (error) {
-      this.message = error instanceof Error ? error.message : 'Could not create your account. Please try again.';
+      const errMsg = error instanceof Error ? error.message : String(error);
+      if (errMsg.toLowerCase().includes('rate limit') || errMsg.toLowerCase().includes('rate_limit')) {
+        this.message = 'Supabase email rate limit exceeded. In your Supabase Dashboard under Authentication > Providers > Email, turn off "Confirm email" so new signups activate instantly without sending verification emails.';
+      } else {
+        this.message = errMsg || 'Could not create your account. Please try again.';
+      }
+      this.cdr.detectChanges();
     } finally {
       this.submitting = false;
+      this.cdr.detectChanges();
     }
   }
 }

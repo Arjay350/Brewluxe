@@ -74,8 +74,26 @@ export class AuthService {
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
       throw new Error('An account with this email already exists. Please sign in instead.');
     }
-    if (data.session && data.user) await this.loadAuthUser(data.user);
-    return !!data.session;
+    if (data.session && data.user) {
+      await this.loadAuthUser(data.user);
+      return true;
+    }
+
+    // If no session returned, try logging in directly in case confirm email is optional
+    try {
+      const loginRes = await this.supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+      if (loginRes.data?.session && loginRes.data?.user) {
+        await this.loadAuthUser(loginRes.data.user);
+        return true;
+      }
+    } catch {
+      // Email confirmation required or signin pending
+    }
+
+    return false;
   }
 
   async logout(): Promise<void> {
