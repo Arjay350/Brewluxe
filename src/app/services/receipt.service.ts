@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { CartItem } from '../models/product.model';
 
 export interface EmailReceiptResult {
@@ -23,66 +22,36 @@ export interface ReceiptOrderDetails {
 
 @Injectable({ providedIn: 'root' })
 export class ReceiptService {
-  private readonly apiKey = (environment as Record<string, unknown>)['resendApiKey'] as string || 're_test_sample_key';
-
   async sendOrderReceipt(order: ReceiptOrderDetails): Promise<EmailReceiptResult> {
-    const htmlReceipt = this.renderReceiptHtml(order);
-
-    // If sandbox placeholder or unconfigured, simulate email dispatch safely
-    if (!this.apiKey || this.apiKey === 're_test_sample_key') {
-      return {
-        success: true,
-        isSimulation: true,
-        message: `Simulated email receipt for Order #${order.orderId.slice(0, 8)} sent to ${order.customerEmail}`,
-      };
-    }
-
-    try {
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          from: 'Brewluxe Café <onboarding@resend.dev>',
-          to: [order.customerEmail],
-          subject: `Brewluxe Receipt - Order #${order.orderId.slice(0, 8)}`,
-          html: htmlReceipt,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Resend API call failed');
-      }
-
-      return {
-        success: true,
-        isSimulation: false,
-        message: `Receipt successfully emailed to ${order.customerEmail}`,
-      };
-    } catch (err) {
-      return {
-        success: false,
-        isSimulation: false,
-        message: err instanceof Error ? err.message : 'Could not dispatch email receipt.',
-      };
-    }
+    void order;
+    return {
+      success: false,
+      isSimulation: false,
+      message: 'Email receipt delivery is unavailable until a trusted server endpoint is configured.',
+    };
   }
 
   renderReceiptHtml(order: ReceiptOrderDetails): string {
     const itemRows = order.items
-      .map(
-        (i) =>
-          `<tr>
+      .map((i) => {
+        const sizeSurcharge = (i.size ?? 'Regular') === 'Large' ? 20 : 0;
+        const addonTotal = i.addons.reduce((sum, addon) => sum + ({
+          'Espresso Shot': 20,
+          'Extra Whip': 15,
+          'Pearls': 15,
+          'Caramel Drizzle': 15,
+        }[addon] ?? 0), 0);
+        const unitTotal = i.product.price + sizeSurcharge + addonTotal;
+
+        return `<tr>
             <td style="padding: 8px 0; border-bottom: 1px solid #eee;">
-              <strong>${i.product.name}</strong> (${i.size})<br>
+              <strong>${i.product.name}</strong> (${i.size || 'Regular'})<br>
               <small style="color: #666;">${i.addons.length ? 'Add-ons: ' + i.addons.join(', ') : 'No extras'}</small>
             </td>
             <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: center;">${i.quantity}</td>
-            <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">₱${i.product.price * i.quantity}</td>
-          </tr>`
-      )
+            <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">₱${unitTotal * i.quantity}</td>
+          </tr>`;
+      })
       .join('');
 
     return `

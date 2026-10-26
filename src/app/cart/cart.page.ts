@@ -107,7 +107,7 @@ export class CartPage implements OnInit, OnDestroy {
 
   get itemsSubtotal(): number {
     return this.cartItems.reduce(
-      (sum, item) => sum + item.product.price * item.quantity,
+      (sum, item) => sum + this.cartService.getItemLinePrice(item),
       0,
     );
   }
@@ -203,12 +203,11 @@ export class CartPage implements OnInit, OnDestroy {
 
   get draftSinglePrice(): number {
     if (!this.currentEditingItem || !this.editDraft) return 0;
-    const base = this.currentEditingItem.product.price;
-    const addonsCost = this.editDraft.addons.reduce((sum, a) => {
-      const found = this.addonOptions.find((opt) => opt.name === a);
-      return sum + (found ? found.price : 0);
-    }, 0);
-    return base + addonsCost;
+    return this.cartService.getItemUnitPrice(
+      this.currentEditingItem.product,
+      this.editDraft.size,
+      this.editDraft.addons,
+    );
   }
 
   get draftLinePrice(): number {
@@ -251,9 +250,7 @@ export class CartPage implements OnInit, OnDestroy {
   }
 
   getItemLinePrice(item: CartItem): number {
-    return (
-      item.product.price * item.quantity + this.cartService.getAddonsPrice(item)
-    );
+    return this.cartService.getItemLinePrice(item);
   }
 
   proceedToCheckout(): void {

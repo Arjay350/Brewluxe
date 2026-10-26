@@ -104,6 +104,20 @@ npm test
 npm run build
 ```
 
+### Building the Android APK
+
+Install **Android Studio** with the Android SDK and a **Java 21 JDK**, then configure `ANDROID_HOME` (or `ANDROID_SDK_ROOT`) for the installed SDK.
+
+```bash
+# Generate and synchronize the native Android project after changing web code
+npm run android:sync
+
+# Build a debug APK
+npm run android:apk
+```
+
+The debug APK is generated at `android/app/build/outputs/apk/debug/app-debug.apk`. To open the native project in Android Studio, run `npm run android:open`.
+
 ---
 
 ## 🌐 Deployment on Vercel

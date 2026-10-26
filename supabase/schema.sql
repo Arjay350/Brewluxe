@@ -237,14 +237,21 @@ begin
   loop
     v_quantity := (v_item ->> 'quantity')::integer;
     if v_quantity < 1 or v_quantity > 50 then raise exception 'Invalid item quantity.'; end if;
+    if lower(coalesce(v_item ->> 'size', 'Regular')) not in ('regular', 'large') then raise exception 'Select a valid product size.'; end if;
     select coalesce(array_agg(value), '{}') into v_addons from jsonb_array_elements_text(coalesce(v_item -> 'addons', '[]'::jsonb));
     if exists (select 1 from unnest(v_addons) addon where addon not in ('Espresso Shot', 'Extra Whip', 'Pearls', 'Caramel Drizzle')) then
       raise exception 'Invalid product add-on.';
     end if;
     select * into v_product from public.products
-      where id = (v_item ->> 'product_id')::bigint and available = true;
+      where id = (v_item ->> 'product_id')::bigint and available = true for share;
     if not found then raise exception 'A product in your cart is no longer available.'; end if;
+    if v_product.category = 'Pastries' and lower(coalesce(v_item ->> 'size', 'Regular')) = 'large' then
+      raise exception 'Pastries do not support size selection.';
+    end if;
     v_unit_price := v_product.price + coalesce((select sum(case addon when 'Espresso Shot' then 20 when 'Extra Whip' then 15 else 15 end) from unnest(v_addons) addon), 0);
+    if lower(coalesce(v_item ->> 'size', 'Regular')) = 'large' then
+      v_unit_price := v_unit_price + 20;
+    end if;
     v_subtotal := v_subtotal + (v_unit_price * v_quantity);
   end loop;
 
@@ -257,9 +264,13 @@ begin
   for v_item in select value from jsonb_array_elements(p_items)
   loop
     v_quantity := (v_item ->> 'quantity')::integer;
+    if lower(coalesce(v_item ->> 'size', 'Regular')) not in ('regular', 'large') then raise exception 'Select a valid product size.'; end if;
     select coalesce(array_agg(value), '{}') into v_addons from jsonb_array_elements_text(coalesce(v_item -> 'addons', '[]'::jsonb));
     select * into v_product from public.products where id = (v_item ->> 'product_id')::bigint;
     v_unit_price := v_product.price + coalesce((select sum(case addon when 'Espresso Shot' then 20 when 'Extra Whip' then 15 else 15 end) from unnest(v_addons) addon), 0);
+    if lower(coalesce(v_item ->> 'size', 'Regular')) = 'large' then
+      v_unit_price := v_unit_price + 20;
+    end if;
     insert into public.order_items (order_id, product_id, product_name, quantity, unit_price, size, addons)
       values (v_order_id, v_product.id, v_product.name, v_quantity, v_unit_price, coalesce(v_item ->> 'size', 'Regular'), v_addons);
   end loop;
@@ -350,6 +361,22 @@ begin
 end $$;
 revoke all on function public.update_brewluxe_order_status(uuid,text) from public;
 grant execute on function public.update_brewluxe_order_status(uuid,text) to authenticated;
+
+-- Customers may cancel their own still-pending order. Keep the transition check
+-- inside the database so cancellation cannot be forged from a client.
+create or replace function public.cancel_brewluxe_customer_order(p_order_id uuid)
+returns void language plpgsql security definer set search_path = '' as $$
+begin
+  if auth.uid() is null then raise exception 'Please sign in to cancel an order.'; end if;
+  update public.orders
+    set status = 'Cancelled'
+    where id = p_order_id and user_id = auth.uid() and status = 'Pending';
+  if not found then
+    raise exception 'This order cannot be cancelled. It may already be processing or may not belong to you.';
+  end if;
+end $$;
+revoke all on function public.cancel_brewluxe_customer_order(uuid) from public;
+grant execute on function public.cancel_brewluxe_customer_order(uuid) to authenticated;
 
 create or replace function public.audit_account_role_change()
 returns trigger language plpgsql security definer set search_path = '' as $$

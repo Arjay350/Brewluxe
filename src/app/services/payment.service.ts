@@ -26,22 +26,21 @@ export class PaymentService {
     customer: { name: string; phone: string; address: string; email?: string },
     deliveryFee = 50,
   ): Promise<CheckoutSessionResult> {
-    // If the key is the placeholder, provide a seamless test simulation
+    // No payment is processed while the public key is unconfigured.
     if (!this.config.publicKey || this.config.publicKey === 'pk_test_sample_key') {
       return {
         success: true,
         isSimulation: true,
-        message: 'PayMongo Sandbox Simulated: Test payment recorded for Order #' + orderId.slice(0, 8),
+        message: 'Payment gateway is not configured. The order will remain pending.',
       };
     }
 
     const lineItems = items.map((item) => {
-      const unitAddons = this.cartService.getAddonsPrice(item) / item.quantity;
-      const unitPriceInCentavos = Math.round((item.product.price + unitAddons) * 100);
+      const unitPriceInCentavos = Math.round(this.cartService.getItemUnitPrice(item.product, item.size, item.addons) * 100);
       const desc = item.addons.length ? `With ${item.addons.join(', ')}` : undefined;
 
       return {
-        name: `${item.product.name} (${item.size})`,
+        name: `${item.product.name} (${item.size || 'Regular'})`,
         amount: unitPriceInCentavos,
         currency: 'PHP',
         quantity: item.quantity,
@@ -75,12 +74,14 @@ export class PaymentService {
           line_items: lineItems,
           payment_method_types: ['gcash', 'maya', 'card', 'qrph'],
           description: `Brewluxe Order #${orderId.slice(0, 8)}`,
-          success_url: `${window.location.origin}/orders?payment=success&order_id=${orderId}`,
+          success_url: `${window.location.origin}/orders?payment=success`,
           cancel_url: `${window.location.origin}/checkout?payment=cancelled`,
         },
       },
     };
 
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 20000);
     try {
       const response = await fetch(`${this.config.apiUrl}/checkout_sessions`, {
         method: 'POST',
@@ -89,6 +90,7 @@ export class PaymentService {
           Authorization: `Basic ${btoa(this.config.publicKey + ':')}`,
         },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -99,6 +101,9 @@ export class PaymentService {
 
       const responseData = await response.json();
       const checkoutUrl = responseData?.data?.attributes?.checkout_url;
+      if (typeof checkoutUrl !== 'string' || !checkoutUrl) {
+        throw new Error('Payment provider did not return a checkout link. No payment was confirmed.');
+      }
 
       return {
         success: true,
@@ -106,11 +111,16 @@ export class PaymentService {
         isSimulation: false,
       };
     } catch (err) {
-      // In local testing, if sandbox connection fails, fallback gracefully with error details
       return {
         success: false,
-        message: err instanceof Error ? err.message : 'Payment gateway communication error.',
+        message: controller.signal.aborted
+          ? 'Payment setup timed out. No payment was confirmed. Check My Orders before trying again.'
+          : err instanceof Error
+            ? err.message
+            : 'Payment gateway communication error. No payment was confirmed.',
       };
+    } finally {
+      window.clearTimeout(timeout);
     }
   }
 }

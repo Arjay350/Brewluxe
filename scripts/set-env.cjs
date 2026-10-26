@@ -24,7 +24,6 @@ if (fs.existsSync(envPath)) {
 const supabaseUrl = process.env.SUPABASE_URL || envVars.SUPABASE_URL || 'https://bpvcqjrqnsfrqvhtdpfr.supabase.co';
 const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || envVars.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_wbeFpm6sPIARL5sowcsOcw_otzsR9Jv';
 const paymongoKey = process.env.PAYMONGO_PUBLIC_KEY || envVars.PAYMONGO_PUBLIC_KEY || 'pk_test_sample_key';
-const resendKey = process.env.RESEND_API_KEY || 're_test_sample_key';
 const cloudinaryName = process.env.CLOUDINARY_CLOUD_NAME || envVars.CLOUDINARY_CLOUD_NAME || 'brewluxe-demo';
 
 const prodEnvContent = `export const environment = {
@@ -35,7 +34,6 @@ const prodEnvContent = `export const environment = {
     apiUrl: 'https://api.paymongo.com/v2',
     publicKey: '${paymongoKey}',
   },
-  resendApiKey: '${resendKey}',
   cloudinaryCloudName: '${cloudinaryName}',
 };
 `;
@@ -48,7 +46,6 @@ const devEnvContent = `export const environment = {
     apiUrl: 'https://api.paymongo.com/v2',
     publicKey: '${paymongoKey}',
   },
-  resendApiKey: '${resendKey}',
   cloudinaryCloudName: '${cloudinaryName}',
 };
 `;

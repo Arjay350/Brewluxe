@@ -225,10 +225,10 @@
     </div>
 
     <!-- Product Not Found State -->
-    <div class="brew-empty-state" *ngIf="!loading && !product">
+    <div class="brew-empty-state" *ngIf="!loading && !product" role="alert">
       <div class="empty-icon">☕</div>
       <h3>Drink Not Found</h3>
-      <p>The product you are looking for is currently unavailable or has been removed.</p>
+      <p>{{ loadError || 'The product you are looking for is currently unavailable or has been removed.' }}</p>
       <ion-button routerLink="/menu" class="brew-btn brew-btn-primary">
         Browse Menu
       </ion-button>

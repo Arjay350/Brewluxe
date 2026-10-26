@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { createClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
 import { CartItem, Product } from '../models/product.model';
-import { NEW_PRODUCTS } from '../data/new-products.data';
 import type { ProductInput } from './product.service';
+import { AuthService } from '../auth/auth.service';
 
 export interface CheckoutDetails {
   customerName: string;
@@ -35,40 +35,36 @@ export interface ProfileDetails { display_name: string; email: string; phone: st
 export class DatabaseService {
   private readonly supabase = createClient(environment.supabaseUrl, environment.supabasePublishableKey);
 
-  async loadProducts(): Promise<Product[]> {
-    try {
-      const { data, error } = await this.supabase
-        .from('products')
-        .select('id,name,category,price,description,image,featured')
-        .eq('available', true)
-        .order('name');
-      if (!error && data && data.some((p: any) => p.image?.endsWith('.webp'))) {
-        return data.map((row) => ({ ...row, available: true })) as Product[];
-      }
-    } catch {}
+  constructor(private readonly auth: AuthService) {}
 
-    // Resilient fallback to the 51 artisan products
-    return [...NEW_PRODUCTS];
+  async loadProducts(): Promise<Product[]> {
+    const { data, error } = await this.supabase
+      .from('products')
+      .select('id,name,category,price,description,image,featured,available')
+      .eq('available', true)
+      .order('name');
+    if (error) throw error;
+    return (data ?? []).map((row) => ({ ...row, available: true })) as Product[];
   }
 
   async loadManageableProducts(): Promise<Product[]> {
-    try {
-      const timeoutPromise = new Promise<{ data: null; error: Error }>((_, reject) =>
-        setTimeout(() => reject(new Error('timeout')), 3000),
-      );
-      const queryPromise = this.supabase
-        .from('products')
-        .select('id,name,category,price,description,image,featured,available')
-        .order('name');
+    const { data, error } = await this.supabase
+      .from('products')
+      .select('id,name,category,price,description,image,featured,available')
+      .order('name');
+    if (error) throw error;
+    return (data ?? []) as Product[];
+  }
 
-      const { data, error } = (await Promise.race([queryPromise, timeoutPromise])) as any;
-      if (!error && data && data.some((p: any) => p.image?.endsWith('.webp'))) {
-        return data as Product[];
-      }
-    } catch {}
-
-    // Resilient fallback to local products
-    return [...NEW_PRODUCTS];
+  async getProductById(id: number): Promise<Product | undefined> {
+    const { data, error } = await this.supabase
+      .from('products')
+      .select('id,name,category,price,description,image,featured,available')
+      .eq('id', id)
+      .eq('available', true)
+      .maybeSingle();
+    if (error) throw error;
+    return data as Product | null ?? undefined;
   }
 
   async uploadProductImage(file: File): Promise<string> {
@@ -142,23 +138,42 @@ export class DatabaseService {
   }
 
   async setProductAvailability(id: number, available: boolean): Promise<void> {
-    try {
-      const { error } = await this.supabase.from('products').update({ available }).eq('id', id);
-      if (!error) return;
-    } catch {}
+    const { error } = await this.supabase.from('products').update({ available }).eq('id', id);
+    if (error) throw error;
   }
 
   async placeOrder(items: CartItem[], details: CheckoutDetails): Promise<string> {
-    const { data, error } = await this.supabase.rpc('create_brewluxe_order', {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 20000);
+    try {
+      const { data, error } = await this.supabase.rpc('create_brewluxe_order', {
       p_customer_name: details.customerName.trim(),
       p_phone: details.phone.trim(),
       p_address: details.address.trim(),
       p_payment_method: details.paymentMethod,
       p_payment_reference: details.paymentReference?.trim() || null,
-      p_items: items.map((item) => ({ product_id: item.product.id, quantity: item.quantity, size: item.size, addons: item.addons })),
-    });
-    if (error) throw error;
-    return String(data);
+      p_items: items.map((item) => ({
+        product_id: item.product.id,
+        quantity: item.quantity,
+        size: item.size || 'Regular',
+        addons: item.addons || [],
+      })),
+      }).abortSignal(controller.signal);
+      if (error) {
+        if (controller.signal.aborted) {
+          throw new Error('Order saving timed out. Check My Orders before submitting again; the save may still have completed.');
+        }
+        throw error;
+      }
+      return String(data);
+    } catch (error) {
+      if (controller.signal.aborted) {
+        throw new Error('Order saving timed out. Check My Orders before submitting again; the save may still have completed.');
+      }
+      throw error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
   }
 
   async submitContact(message: { name: string; email: string; subject: string; message: string }): Promise<void> {
@@ -170,11 +185,32 @@ export class DatabaseService {
   }
 
   async getMyOrders(): Promise<Array<Record<string, unknown>>> {
-    const { data, error } = await this.supabase.from('orders')
-      .select('id,created_at,total,payment_method,status,customer_name,order_items(product_id,product_name,quantity,unit_price,size,addons)')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return data ?? [];
+    const userId = this.auth.getCurrentUser()?.id;
+    if (!userId) return [];
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
+    try {
+      const { data, error } = await this.supabase.from('orders')
+        .select('id,created_at,total,payment_method,status,customer_name,order_items(product_id,product_name,quantity,unit_price,size,addons)')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .abortSignal(controller.signal);
+      if (error) {
+        if (controller.signal.aborted) {
+          throw new Error('Order history took too long to load. Check your connection and retry.');
+        }
+        throw error;
+      }
+      return data ?? [];
+    } catch (error) {
+      if (controller.signal.aborted) {
+        throw new Error('Order history took too long to load. Check your connection and retry.');
+      }
+      throw error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
   }
 
   subscribeToOrders(callback: () => void): () => void {
@@ -191,133 +227,74 @@ export class DatabaseService {
   }
 
   async cancelOrder(orderId: string): Promise<void> {
-    try {
-      const { error } = await this.supabase
-        .from('orders')
-        .update({ status: 'Cancelled' })
-        .eq('id', orderId)
-        .eq('status', 'Pending');
-      if (error) {
-        await this.updateOrderStatus(orderId, 'Cancelled');
-      }
-    } catch {
-      throw new Error('Order could not be cancelled. If it is already being prepared, please contact staff.');
-    }
+    const { error } = await this.supabase.rpc('cancel_brewluxe_customer_order', { p_order_id: orderId });
+    if (error) throw error;
   }
 
   async getStaffOrders(): Promise<OrderRecord[]> {
-    const isDemo = !!localStorage.getItem('brewluxe-demo-user');
-    if (!isDemo) {
-      try {
-        const timeoutPromise = new Promise<{ data: null; error: Error }>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), 3000),
-        );
-        const queryPromise = this.supabase
-          .from('orders')
-          .select(
-            'id,created_at,total,payment_method,status,customer_name,phone,address,order_items(product_name,quantity,unit_price)',
-          )
-          .order('created_at', { ascending: false });
-
-        const { data, error } = (await Promise.race([queryPromise, timeoutPromise])) as any;
-        if (!error && data && data.length) {
-          return data as unknown as OrderRecord[];
-        }
-      } catch {}
-    }
-
-    // Return empty queue if no orders are present
-    return [];
+    const { data, error } = await this.supabase
+      .from('orders')
+      .select('id,created_at,total,payment_method,status,customer_name,phone,address,order_items(product_name,quantity,unit_price)')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as unknown as OrderRecord[];
   }
 
   async updateOrderStatus(orderId: string, status: string): Promise<void> {
-    try {
-      const { error } = await this.supabase.rpc('update_brewluxe_order_status', { p_order_id: orderId, p_status: status });
-      if (!error) return;
-    } catch {}
+    const { error } = await this.supabase.rpc('update_brewluxe_order_status', { p_order_id: orderId, p_status: status });
+    if (error) throw error;
   }
 
   async getProfile(): Promise<ProfileDetails> {
-    const localSaved = localStorage.getItem('brewluxe-local-profile');
-    if (localSaved) {
-      try {
-        return JSON.parse(localSaved);
-      } catch {}
-    }
-
-    try {
-      const { data, error } = await this.supabase
-        .from('profiles')
-        .select('display_name,email,phone,address')
-        .single();
-      if (!error && data) {
-        return {
-          display_name: data.display_name ?? '',
-          email: data.email ?? '',
-          phone: data.phone ?? '',
-          address: data.address ?? '',
-        };
-      }
-    } catch {}
-
-    const authUser = (await this.supabase.auth.getUser()).data.user;
+    const { data: authData, error: authError } = await this.supabase.auth.getUser();
+    if (authError) throw authError;
+    const authUser = authData.user;
+    if (!authUser) throw new Error('Please sign in to view your profile.');
+    const { data, error } = await this.supabase
+      .from('profiles')
+      .select('display_name,email,phone,address')
+      .eq('id', authUser.id)
+      .single();
+    if (error) throw error;
     return {
-      display_name: authUser?.user_metadata?.['display_name'] || '',
-      email: authUser?.email || '',
-      phone: authUser?.user_metadata?.['phone'] || '',
-      address: '',
+      display_name: data.display_name ?? '',
+      email: data.email ?? authUser.email ?? '',
+      phone: data.phone ?? '',
+      address: data.address ?? '',
     };
   }
 
   async saveProfile(profile: Pick<ProfileDetails, 'display_name' | 'phone' | 'address'>): Promise<void> {
-    try {
-      const user = (await this.supabase.auth.getUser()).data.user;
-      if (user) {
-        const { error } = await this.supabase.from('profiles').update({
-          display_name: profile.display_name.trim(),
-          phone: profile.phone.trim(),
-          address: profile.address.trim(),
-          updated_at: new Date().toISOString(),
-        }).eq('id', user.id);
-        if (!error) return;
-      }
-    } catch {}
-
-    localStorage.setItem(
-      'brewluxe-local-profile',
-      JSON.stringify(profile),
-    );
+    const { data: authData, error: authError } = await this.supabase.auth.getUser();
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('Please sign in to update your profile.');
+    const { error } = await this.supabase.from('profiles').update({
+      display_name: profile.display_name.trim(),
+      phone: profile.phone.trim(),
+      address: profile.address.trim(),
+      updated_at: new Date().toISOString(),
+    }).eq('id', authData.user.id);
+    if (error) throw error;
   }
 
   async getAdminOrders(): Promise<OrderRecord[]> { return this.getStaffOrders(); }
 
   async getAuditLog(): Promise<Array<{ id: number; actor_email: string; action: string; entity_type: string; entity_id: string; details: Record<string, unknown>; created_at: string }>> {
-    try {
-      const { data, error } = await this.supabase.from('audit_logs').select('id,actor_email,action,entity_type,entity_id,details,created_at').order('created_at', { ascending: false }).limit(200);
-      if (!error && data && data.length) {
-        return data as Array<{ id: number; actor_email: string; action: string; entity_type: string; entity_id: string; details: Record<string, unknown>; created_at: string }>;
-      }
-    } catch {}
-
-    return [];
+    const { data, error } = await this.supabase.from('audit_logs').select('id,actor_email,action,entity_type,entity_id,details,created_at').order('created_at', { ascending: false }).limit(200);
+    if (error) throw error;
+    return (data ?? []) as Array<{ id: number; actor_email: string; action: string; entity_type: string; entity_id: string; details: Record<string, unknown>; created_at: string }>;
   }
 
   async listAccounts(): Promise<ManagedAccount[]> {
-    try {
-      const { data, error } = await this.supabase.rpc('list_brewluxe_accounts');
-      if (!error && data && data.length) return data as ManagedAccount[];
-    } catch {}
-
-    return [];
+    const { data, error } = await this.supabase.rpc('list_brewluxe_accounts');
+    if (error) throw error;
+    return (data ?? []) as ManagedAccount[];
   }
 
   async listStaffAccounts(): Promise<ManagedAccount[]> {
-    try {
-      const { data, error } = await this.supabase.rpc('list_brewluxe_staff_accounts');
-      if (!error && data && data.length) return data as ManagedAccount[];
-    } catch {}
-
-    return [];
+    const { data, error } = await this.supabase.rpc('list_brewluxe_staff_accounts');
+    if (error) throw error;
+    return (data ?? []) as ManagedAccount[];
   }
 
   async setAccountRole(userId: string, role: ManagedAccount['role']): Promise<void> {

@@ -124,9 +124,8 @@ describe('CartService', () => {
     const items = service.getItems();
     expect(items.length).toBe(1);
     expect(items[0].quantity).toBe(3);
-    // Pearls 15 + Caramel Drizzle 15 = 30 addons per unit. Total addons for 3 items = 90.
-    // Base 150 * 3 = 450. Total = 540.
-    expect(service.getSubtotal()).toBe(540);
+    // Base 150 + Large surcharge 20 + addons 30 = 200 per unit. 200 * 3 = 600.
+    expect(service.getSubtotal()).toBe(600);
   });
 
   it('should update drink preferences using updateItem', () => {
@@ -146,6 +145,6 @@ describe('CartService', () => {
     expect(updated.sugarLevel).toBe('50%');
     expect(updated.iceLevel).toBe('Less Ice');
     expect(updated.addons).toEqual(['Espresso Shot']);
-    expect(service.getSubtotal()).toBe(170); // 150 + 20 addon
+    expect(service.getSubtotal()).toBe(190); // 150 + 20 size + 20 addon
   });
 });

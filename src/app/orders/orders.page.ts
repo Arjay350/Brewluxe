@@ -23,10 +23,11 @@ import {
   cartOutline,
   arrowForwardOutline,
   sparklesOutline,
+  syncOutline,
 } from 'ionicons/icons';
 import { Subscription } from 'rxjs';
 import { CartItem } from '../models/product.model';
-import { CartService } from '../services/cart.service';
+import { CartService, getCartSizeSurcharge } from '../services/cart.service';
 import { DatabaseService } from '../services/database.service';
 
 interface OrderItemRecord {
@@ -76,6 +77,9 @@ interface OrderRecord {
         </div>
 
         <ion-buttons slot="end">
+          <ion-button (click)="loadOrders()" [disabled]="loading" aria-label="Refresh order history">
+            <ion-icon slot="icon-only" name="sync-outline"></ion-icon>
+          </ion-button>
           <ion-button routerLink="/cart" aria-label="View Cart" class="cart-nav-btn">
             <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
             <ion-badge *ngIf="itemCount > 0" class="nav-cart-badge">{{ itemCount }}</ion-badge>
@@ -95,14 +99,14 @@ interface OrderRecord {
           </p>
         </div>
 
-        <!-- Success Banner from PayMongo redirect -->
+        <!-- Return from payment provider is not backend confirmation. -->
         <div class="payment-success-banner" *ngIf="paymentSuccess">
           <div class="banner-icon">
             <ion-icon name="checkmark-circle-outline"></ion-icon>
           </div>
           <div class="banner-text">
-            <strong>Payment Confirmed via PayMongo!</strong>
-            <p>Your order is secured and has been sent to our barista for preparation.</p>
+            <strong>Payment status is pending confirmation</strong>
+            <p>We returned from the payment page. Your order remains Pending until Brewluxe verifies the payment.</p>
           </div>
         </div>
 
@@ -118,6 +122,9 @@ interface OrderRecord {
         <!-- Error State -->
         <div class="error-banner" *ngIf="error" role="alert">
           <p>{{ error }}</p>
+          <ion-button fill="clear" size="small" class="retry-order-button" (click)="loadOrders()">
+            Retry
+          </ion-button>
         </div>
 
         <!-- Empty State -->
@@ -656,6 +663,10 @@ interface OrderRecord {
     }
 
     .error-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       padding: 14px 18px;
       border-radius: var(--brew-radius-md);
       background: #FDEDED;
@@ -663,6 +674,15 @@ interface OrderRecord {
       color: var(--ion-color-danger);
       font-weight: 600;
       margin-bottom: 20px;
+
+      p {
+        margin: 0;
+      }
+    }
+
+    .retry-order-button {
+      --color: var(--brew-espresso);
+      font-weight: 700;
     }
   `],
 })
@@ -675,6 +695,7 @@ export class OrdersPage implements OnInit, OnDestroy {
 
   private unsubscribeRealtime?: () => void;
   private cartSub?: Subscription;
+  private loadOrdersPromise: Promise<void> | null = null;
 
   constructor(
     private readonly database: DatabaseService,
@@ -693,6 +714,7 @@ export class OrdersPage implements OnInit, OnDestroy {
       cartOutline,
       arrowForwardOutline,
       sparklesOutline,
+      syncOutline,
     });
   }
 
@@ -704,12 +726,11 @@ export class OrdersPage implements OnInit, OnDestroy {
 
     this.paymentSuccess =
       this.route.snapshot.queryParams['payment'] === 'success';
-    await this.loadOrders();
-
     // Real-time listener for order status changes in Supabase
     this.unsubscribeRealtime = this.database.subscribeToOrders(() => {
       this.loadOrders(false);
     });
+    await this.loadOrders();
   }
 
   ngOnDestroy(): void {
@@ -718,15 +739,34 @@ export class OrdersPage implements OnInit, OnDestroy {
   }
 
   async loadOrders(showSpinner = true): Promise<void> {
-    if (showSpinner) this.loading = true;
+    if (this.loadOrdersPromise) {
+      return this.loadOrdersPromise;
+    }
+
+    if (showSpinner) {
+      this.loading = true;
+    }
+
+    this.loadOrdersPromise = (async () => {
+      this.error = '';
+
+      try {
+        const orders = ((await this.database.getMyOrders()) as unknown as OrderRecord[]) || [];
+        this.orders = orders;
+      } catch (err) {
+        this.orders = [];
+        this.error = err instanceof Error && err.message.includes('Order history took too long')
+          ? err.message
+          : 'Could not load orders. Please sign in again or check your connection and Supabase status.';
+      } finally {
+        this.loading = false;
+      }
+    })();
+
     try {
-      this.orders =
-        ((await this.database.getMyOrders()) as unknown as OrderRecord[]) || [];
-    } catch {
-      this.error =
-        'Could not load orders. Please verify your connection or Supabase status.';
+      await this.loadOrdersPromise;
     } finally {
-      if (showSpinner) this.loading = false;
+      this.loadOrdersPromise = null;
     }
   }
 
@@ -749,12 +789,20 @@ export class OrdersPage implements OnInit, OnDestroy {
 
   async orderAgain(order: OrderRecord): Promise<void> {
     for (const item of order.order_items) {
+      const addonTotal = (item.addons || []).reduce((sum, addon) => sum + ({
+        'Espresso Shot': 20,
+        'Extra Whip': 15,
+        'Pearls': 15,
+        'Caramel Drizzle': 15,
+      }[addon] ?? 0), 0);
+      const basePrice = Math.max(0, item.unit_price - addonTotal - getCartSizeSurcharge(item.size));
+
       const cartItem: CartItem = {
         product: {
           id: item.product_id ?? Math.floor(Math.random() * 100000),
           name: item.product_name,
           category: 'Coffee',
-          price: item.unit_price,
+          price: basePrice,
           description: '',
           image: '',
           featured: false,

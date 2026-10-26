@@ -100,11 +100,15 @@ export class MenuPage implements OnInit, OnDestroy {
       }
     });
 
-    try {
-      this.weather = await this.weatherService.getWeatherRecommendation();
-    } catch {
-      // Graceful fallback if weather fails to load
-    }
+    // Fetch weather asynchronously in background without blocking product rendering
+    this.weatherService
+      .getWeatherRecommendation()
+      .then((weather) => {
+        this.weather = weather;
+      })
+      .catch(() => {
+        // Graceful fallback if weather fails to load
+      });
 
     try {
       this.products = await this.productService.loadProducts();
@@ -184,6 +188,6 @@ export class MenuPage implements OnInit, OnDestroy {
   }
 
   openProduct(product: Product): void {
-    this.router.navigate(['/product-detail', product.id]);
+    this.router.navigate(['/product-detail', product.id], { state: { product } });
   }
 }

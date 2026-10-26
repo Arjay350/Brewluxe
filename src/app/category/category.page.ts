@@ -105,6 +105,6 @@ export class CategoryPage implements OnInit, OnDestroy {
   }
 
   openProduct(product: Product): void {
-    this.router.navigate(['/product-detail', product.id]);
+    this.router.navigate(['/product-detail', product.id], { state: { product } });
   }
 }

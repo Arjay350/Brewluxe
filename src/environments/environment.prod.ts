@@ -6,6 +6,5 @@ export const environment = {
     apiUrl: 'https://api.paymongo.com/v2',
     publicKey: 'pk_test_sample_key',
   },
-  resendApiKey: 're_test_sample_key',
   cloudinaryCloudName: 'jdkqnztn',
 };

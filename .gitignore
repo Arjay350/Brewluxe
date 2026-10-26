@@ -22,6 +22,10 @@ log.txt
 /www
 /platforms
 /plugins
+/android/.gradle
+/android/local.properties
+/android/build
+/android/app/build
 
 # Compiled output
 /dist
@@ -82,4 +86,3 @@ _product-source
 (DONE)*
 Coffee/
 Iced Coffee/
-

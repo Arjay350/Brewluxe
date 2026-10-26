@@ -58,6 +58,7 @@ export class ProductDetailPage implements OnInit, OnDestroy {
   iceLevel = 'Regular Ice';
   selectedAddons: string[] = [];
   loading = true;
+  loadError = '';
   itemCount = 0;
 
   readonly sizeOptions = ['Regular', 'Large'];
@@ -100,8 +101,23 @@ export class ProductDetailPage implements OnInit, OnDestroy {
     });
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
+
+    // Show a recent in-memory result immediately while the service validates it.
+    const immediate = this.productService.getCachedProductById(id);
+    if (immediate) {
+      this.product = immediate;
+      this.loading = false;
+    }
+
     try {
-      this.product = await this.productService.getProductById(id);
+      const fresh = await this.productService.getProductById(id);
+      if (fresh) {
+        this.product = fresh;
+      } else {
+        this.loadError = 'This product is unavailable or could not be found.';
+      }
+    } catch {
+      this.loadError = 'Could not load this product. Check your connection and try again.';
     } finally {
       this.loading = false;
     }
@@ -123,7 +139,7 @@ export class ProductDetailPage implements OnInit, OnDestroy {
 
   get unitPrice(): number {
     if (!this.product) return 0;
-    return this.product.price + this.unitAddonsPrice;
+    return this.cartService.getItemUnitPrice(this.product, this.size, this.selectedAddons);
   }
 
   get totalPrice(): number {

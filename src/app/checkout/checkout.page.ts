@@ -34,7 +34,6 @@ import { AddressService, AddressSuggestion } from '../services/address.service';
 import { CartService } from '../services/cart.service';
 import { DatabaseService } from '../services/database.service';
 import { PaymentService } from '../services/payment.service';
-import { ReceiptService } from '../services/receipt.service';
 
 interface ConfirmedOrder {
   orderId: string;
@@ -44,8 +43,7 @@ interface ConfirmedOrder {
   total: number;
   subtotal: number;
   deliveryFee: number;
-  paymentMethod: string;
-  email: string;
+  status: string;
 }
 
 @Component({
@@ -94,10 +92,10 @@ interface ConfirmedOrder {
             <div class="success-icon-wrap">
               <ion-icon name="checkmark-circle-outline"></ion-icon>
             </div>
-            <span class="eyebrow">Order Placed Successfully!</span>
+            <span class="eyebrow">Order Received · {{ confirmedOrder.status }}</span>
             <h1 class="confirmation-title">Thank You, {{ confirmedOrder.name }}!</h1>
             <p class="confirmation-subtext">
-              Your Brewluxe order is now being prepared with fresh ingredients. A confirmation receipt has been dispatched to <strong>{{ confirmedOrder.email }}</strong>.
+              Your order was saved and is pending staff confirmation. Payment has not been confirmed in this app. Track the current status in My Orders.
             </p>
 
             <div class="order-receipt-box">
@@ -106,7 +104,7 @@ interface ConfirmedOrder {
                   <span class="receipt-label">Order Reference</span>
                   <strong class="receipt-id">#{{ confirmedOrder.orderId.slice(0, 8).toUpperCase() }}</strong>
                 </div>
-                <span class="brew-badge brew-badge-sage">{{ confirmedOrder.paymentMethod }}</span>
+                <span class="brew-badge brew-badge-sage">{{ confirmedOrder.status }}</span>
               </div>
 
               <div class="receipt-details">
@@ -127,7 +125,7 @@ interface ConfirmedOrder {
                   <strong>₱{{ confirmedOrder.deliveryFee }}</strong>
                 </div>
                 <div class="receipt-row total-row">
-                  <span>Total Amount Paid / Due</span>
+                  <span>Total Amount Due</span>
                   <strong>₱{{ confirmedOrder.total }}</strong>
                 </div>
               </div>
@@ -301,6 +299,9 @@ interface ConfirmedOrder {
               </div>
 
               <!-- Status Notice / Error -->
+              <div class="checkout-notice-box" *ngIf="submitting && progressMessage" role="status" aria-live="polite">
+                <span>{{ progressMessage }}</span>
+              </div>
               <div class="checkout-notice-box" *ngIf="message" [class.is-error]="failed" role="alert">
                 <ion-icon [name]="failed ? 'close-circle-outline' : 'checkmark-circle-outline'"></ion-icon>
                 <span>{{ message }}</span>
@@ -330,13 +331,13 @@ interface ConfirmedOrder {
                 <div class="checkout-item-line" *ngFor="let item of items">
                   <div class="checkout-item-info">
                     <strong>{{ item.product.name }}</strong>
-                    <span class="item-specs">{{ item.size }} • {{ item.sugarLevel }} sugar • {{ item.quantity }}x</span>
+                    <span class="item-specs">{{ item.size || 'Regular' }} • {{ item.sugarLevel || '100%' }} sugar • {{ item.quantity }}x</span>
                     <small class="item-addons-text" *ngIf="item.addons && item.addons.length">
                       + {{ item.addons.join(', ') }}
                     </small>
                   </div>
                   <span class="item-line-total">
-                    ₱{{ item.product.price * item.quantity + cart.getAddonsPrice(item) }}
+                    ₱{{ cart.getItemLinePrice(item) }}
                   </span>
                 </div>
               </div>
@@ -350,7 +351,7 @@ interface ConfirmedOrder {
                 <div class="calc-row">
                   <div class="delivery-row-left">
                     <span>Delivery Fee</span>
-                    <small>Calculated by distance</small>
+                    <small>Standard delivery fee</small>
                   </div>
                   <strong>₱{{ deliveryFee }}</strong>
                 </div>
@@ -941,6 +942,7 @@ export class CheckoutPage implements OnInit {
   submitting = false;
   failed = false;
   message = '';
+  progressMessage = '';
   suggestions: AddressSuggestion[] = [];
   confirmedOrder: ConfirmedOrder | null = null;
 
@@ -974,7 +976,6 @@ export class CheckoutPage implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly paymentService: PaymentService,
     private readonly addressService: AddressService,
-    private readonly receiptService: ReceiptService,
   ) {
     addIcons({
       locationOutline,
@@ -1033,7 +1034,9 @@ export class CheckoutPage implements OnInit {
   selectSuggestion(s: AddressSuggestion): void {
     this.form.patchValue({ address: s.displayName });
     this.suggestions = [];
-    this.deliveryFee = this.addressService.calculateDeliveryFee(s.lat, s.lon);
+    // The order RPC currently applies a trusted flat ₱50 delivery fee.
+    // Keep the checkout estimate aligned with the amount persisted by Supabase.
+    this.deliveryFee = 50;
   }
 
   get paymentMethod(): string {
@@ -1041,11 +1044,7 @@ export class CheckoutPage implements OnInit {
   }
 
   get subtotal(): number {
-    return this.items.reduce(
-      (sum, item) =>
-        sum + item.product.price * item.quantity + this.cart.getAddonsPrice(item),
-      0,
-    );
+    return this.items.reduce((sum, item) => sum + this.cart.getItemLinePrice(item), 0);
   }
 
   get total(): number {
@@ -1053,6 +1052,10 @@ export class CheckoutPage implements OnInit {
   }
 
   async submit(): Promise<void> {
+    if (this.submitting) {
+      return;
+    }
+
     if (this.form.invalid || !this.items.length) {
       this.form.markAllAsTouched();
       this.message = 'Please fill out all required fields before placing order.';
@@ -1069,13 +1072,14 @@ export class CheckoutPage implements OnInit {
     this.submitting = true;
     this.message = '';
     this.failed = false;
+    this.progressMessage = 'Preparing your checkout…';
 
     try {
       const value = this.form.getRawValue();
       const user = this.auth.getCurrentUser();
-      const email = user?.email || '';
 
       if (value.paymentMethod === 'Cash on Delivery') {
+        this.progressMessage = 'Saving your order…';
         const orderId = await this.db.placeOrder(this.items, {
           customerName: value.name,
           phone: value.phone,
@@ -1083,22 +1087,6 @@ export class CheckoutPage implements OnInit {
           paymentMethod: 'Cash on Delivery',
           paymentReference: 'COD',
         });
-
-        // Dispatch receipt via Resend API (simulation mode in sandbox)
-        this.receiptService
-          .sendOrderReceipt({
-            orderId,
-            customerName: value.name,
-            customerEmail: email,
-            phone: value.phone,
-            address: value.address,
-            items: [...this.items],
-            subtotal: this.subtotal,
-            deliveryFee: this.deliveryFee,
-            total: this.total,
-            paymentMethod: 'Cash on Delivery',
-          })
-          .catch(() => {});
 
         this.confirmedOrder = {
           orderId,
@@ -1108,8 +1096,7 @@ export class CheckoutPage implements OnInit {
           total: this.total,
           subtotal: this.subtotal,
           deliveryFee: this.deliveryFee,
-          paymentMethod: 'Cash on Delivery',
-          email,
+          status: 'Pending',
         };
 
         this.cart.clearCart();
@@ -1120,6 +1107,7 @@ export class CheckoutPage implements OnInit {
       // Online payment via PayMongo Sandbox
       const tempRef =
         'PM-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+      this.progressMessage = 'Connecting to the payment provider…';
       const sessionResult = await this.paymentService.createCheckoutSession(
         tempRef,
         this.items,
@@ -1138,6 +1126,7 @@ export class CheckoutPage implements OnInit {
         );
       }
 
+      this.progressMessage = 'Saving your order…';
       const orderId = await this.db.placeOrder(this.items, {
         customerName: value.name,
         phone: value.phone,
@@ -1146,23 +1135,8 @@ export class CheckoutPage implements OnInit {
         paymentReference: tempRef,
       });
 
-      // Dispatch receipt via Resend API
-      this.receiptService
-        .sendOrderReceipt({
-          orderId,
-          customerName: value.name,
-          customerEmail: email,
-          phone: value.phone,
-          address: value.address,
-          items: [...this.items],
-          subtotal: this.subtotal,
-          deliveryFee: this.deliveryFee,
-          total: this.total,
-          paymentMethod: value.paymentMethod,
-        })
-        .catch(() => {});
-
       if (sessionResult.checkoutUrl) {
+        this.progressMessage = 'Order saved as Pending. Opening the payment page…';
         this.cart.clearCart();
         this.items = [];
         // Redirect to PayMongo hosted checkout
@@ -1177,8 +1151,7 @@ export class CheckoutPage implements OnInit {
           total: this.total,
           subtotal: this.subtotal,
           deliveryFee: this.deliveryFee,
-          paymentMethod: value.paymentMethod,
-          email,
+          status: 'Pending',
         };
         this.cart.clearCart();
         this.items = [];

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
@@ -24,6 +24,7 @@ import {
 } from 'ionicons/icons';
 import { getNextOrderStatuses, isOrderClosed } from '../models/order-status.model';
 import { DatabaseService, OrderRecord } from '../services/database.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-staff-orders',
@@ -492,15 +493,18 @@ import { DatabaseService, OrderRecord } from '../services/database.service';
     }
   `],
 })
-export class StaffOrdersPage implements OnInit {
+export class StaffOrdersPage implements OnInit, OnDestroy {
   orders: OrderRecord[] = [];
   draft: Record<string, string> = {};
   loading = true;
   pending = '';
   message = '';
+  private unsubscribeRealtime?: () => void;
+  private refreshPromise: Promise<void> | null = null;
 
   constructor(
     private readonly db: DatabaseService,
+    private readonly auth: AuthService,
     private readonly cdr: ChangeDetectorRef,
   ) {
     addIcons({
@@ -514,23 +518,39 @@ export class StaffOrdersPage implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.unsubscribeRealtime = this.db.subscribeToOrders(() => {
+      void this.refresh(false);
+    });
     await this.refresh();
   }
 
-  async refresh(): Promise<void> {
-    this.loading = true;
+  ngOnDestroy(): void {
+    this.unsubscribeRealtime?.();
+  }
+
+  async refresh(showSpinner = true): Promise<void> {
+    if (this.refreshPromise) return this.refreshPromise;
+    if (showSpinner) this.loading = true;
     this.cdr.detectChanges();
+    this.refreshPromise = (async () => {
+      try {
+        this.orders = await this.db.getStaffOrders();
+        this.orders.forEach((o) => (this.draft[o.id] = o.status));
+        this.message = '';
+      } catch (e) {
+        this.message =
+          e instanceof Error
+            ? e.message
+            : 'Could not load order queue. Apply the Supabase schema updates.';
+      } finally {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    })();
     try {
-      this.orders = await this.db.getStaffOrders();
-      this.orders.forEach((o) => (this.draft[o.id] = o.status));
-    } catch (e) {
-      this.message =
-        e instanceof Error
-          ? e.message
-          : 'Could not load order queue. Apply the Supabase schema updates.';
+      await this.refreshPromise;
     } finally {
-      this.loading = false;
-      this.cdr.detectChanges();
+      this.refreshPromise = null;
     }
   }
 
@@ -539,7 +559,11 @@ export class StaffOrdersPage implements OnInit {
   }
 
   nextStatuses(o: OrderRecord): string[] {
-    return getNextOrderStatuses(o.status);
+    const statuses = getNextOrderStatuses(o.status);
+    if (this.auth.getCurrentRole() === 'EMPLOYEE') {
+      return statuses.filter((status) => status !== 'Cancelled' && status !== 'Out for delivery');
+    }
+    return statuses;
   }
 
   async save(o: OrderRecord): Promise<void> {

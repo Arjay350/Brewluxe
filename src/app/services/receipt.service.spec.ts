@@ -54,31 +54,10 @@ describe('ReceiptService', () => {
     expect(html).toContain('123 Katipunan Ave');
   });
 
-  it('should return simulated email receipt in test mode', async () => {
-    const testService = new ReceiptService();
-    (testService as unknown as { apiKey: string }).apiKey = 're_test_sample_key';
-    const result = await testService.sendOrderReceipt(mockOrder);
-    expect(result.success).toBe(true);
-    expect(result.isSimulation).toBe(true);
-    expect(result.message).toContain('Simulated email receipt');
-  });
-
-  it('should dispatch real email when live API key is configured', async () => {
-    const testService = new ReceiptService();
-    (testService as unknown as { apiKey: string }).apiKey = 're_test_valid_key';
-    const originalFetch = globalThis.fetch;
-    globalThis.fetch = (async () => ({
-      ok: true,
-      json: async () => ({ id: 'email_123' }),
-    })) as unknown as typeof fetch;
-
-    try {
-      const result = await testService.sendOrderReceipt(mockOrder);
-      expect(result.success).toBe(true);
-      expect(result.isSimulation).toBe(false);
-      expect(result.message).toContain('Receipt successfully emailed');
-    } finally {
-      globalThis.fetch = originalFetch;
-    }
+  it('does not claim to send email without a trusted server endpoint', async () => {
+    const result = await service.sendOrderReceipt(mockOrder);
+    expect(result.success).toBe(false);
+    expect(result.isSimulation).toBe(false);
+    expect(result.message).toContain('trusted server endpoint');
   });
 });
