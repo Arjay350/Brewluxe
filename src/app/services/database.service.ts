@@ -143,34 +143,44 @@ export class DatabaseService {
   }
 
   async placeOrder(items: CartItem[], details: CheckoutDetails): Promise<string> {
+    const timeoutMessage =
+      'Order saving timed out. Check My Orders before submitting again; the save may still have completed.';
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 20000);
-    try {
+    let timeout: number | undefined;
+
+    // Hard deadline: aborting the request alone cannot free a stalled auth call,
+    // so the race guarantees the checkout button always comes back with a message.
+    const deadline = new Promise<never>((_, reject) => {
+      timeout = window.setTimeout(() => {
+        controller.abort();
+        reject(new Error(timeoutMessage));
+      }, 20000);
+    });
+
+    const save = async (): Promise<string> => {
       const { data, error } = await this.supabase.rpc('create_brewluxe_order', {
-      p_customer_name: details.customerName.trim(),
-      p_phone: details.phone.trim(),
-      p_address: details.address.trim(),
-      p_payment_method: details.paymentMethod,
-      p_payment_reference: details.paymentReference?.trim() || null,
-      p_items: items.map((item) => ({
-        product_id: item.product.id,
-        quantity: item.quantity,
-        size: item.size || 'Regular',
-        addons: item.addons || [],
-      })),
+        p_customer_name: details.customerName.trim(),
+        p_phone: details.phone.trim(),
+        p_address: details.address.trim(),
+        p_payment_method: details.paymentMethod,
+        p_payment_reference: details.paymentReference?.trim() || null,
+        p_items: items.map((item) => ({
+          product_id: item.product.id,
+          quantity: item.quantity,
+          size: item.size || 'Regular',
+          addons: item.addons || [],
+        })),
       }).abortSignal(controller.signal);
       if (error) {
-        if (controller.signal.aborted) {
-          throw new Error('Order saving timed out. Check My Orders before submitting again; the save may still have completed.');
-        }
+        if (controller.signal.aborted) throw new Error(timeoutMessage);
+        console.error('[Brewluxe] Placing order failed:', error);
         throw error;
       }
       return String(data);
-    } catch (error) {
-      if (controller.signal.aborted) {
-        throw new Error('Order saving timed out. Check My Orders before submitting again; the save may still have completed.');
-      }
-      throw error;
+    };
+
+    try {
+      return await Promise.race([save(), deadline]);
     } finally {
       window.clearTimeout(timeout);
     }
