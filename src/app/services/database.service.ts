@@ -185,32 +185,42 @@ export class DatabaseService {
   }
 
   async getMyOrders(): Promise<Array<Record<string, unknown>>> {
-    // Ask the shared client for the live session first; the cached profile user
-    // can still be null for a moment right after sign-in or a page refresh.
-    const { data: sessionData } = await this.supabase.auth.getSession();
-    const userId = sessionData.session?.user.id ?? this.auth.getCurrentUser()?.id;
-    if (!userId) return [];
-
+    const slowMessage = 'Order history took too long to load. Check your connection and retry.';
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 15000);
-    try {
+    let timeout: number | undefined;
+
+    // One hard deadline for the WHOLE load (session lookup + query). Aborting the
+    // request alone cannot free a stalled auth lock, so the race below is what
+    // guarantees the page leaves its loading skeleton and shows an error + retry.
+    const deadline = new Promise<never>((_, reject) => {
+      timeout = window.setTimeout(() => {
+        controller.abort();
+        reject(new Error(slowMessage));
+      }, 15000);
+    });
+
+    const load = async (): Promise<Array<Record<string, unknown>>> => {
+      // Ask the shared client for the live session first; the cached profile user
+      // can still be null for a moment right after sign-in or a page refresh.
+      const { data: sessionData } = await this.supabase.auth.getSession();
+      const userId = sessionData.session?.user.id ?? this.auth.getCurrentUser()?.id;
+      if (!userId) return [];
+
       const { data, error } = await this.supabase.from('orders')
         .select('id,created_at,total,payment_method,status,customer_name,order_items(product_id,product_name,quantity,unit_price,size,addons)')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .abortSignal(controller.signal);
       if (error) {
-        if (controller.signal.aborted) {
-          throw new Error('Order history took too long to load. Check your connection and retry.');
-        }
+        if (controller.signal.aborted) throw new Error(slowMessage);
+        console.error('[Brewluxe] Order history query failed:', error);
         throw error;
       }
       return data ?? [];
-    } catch (error) {
-      if (controller.signal.aborted) {
-        throw new Error('Order history took too long to load. Check your connection and retry.');
-      }
-      throw error;
+    };
+
+    try {
+      return await Promise.race([load(), deadline]);
     } finally {
       window.clearTimeout(timeout);
     }
