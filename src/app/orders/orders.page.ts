@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonButton,
@@ -696,6 +696,7 @@ export class OrdersPage implements OnInit, OnDestroy {
   private unsubscribeRealtime?: () => void;
   private cartSub?: Subscription;
   private loadOrdersPromise: Promise<void> | null = null;
+  private destroyed = false;
 
   constructor(
     private readonly database: DatabaseService,
@@ -703,6 +704,7 @@ export class OrdersPage implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly cartService: CartService,
     private readonly toastCtrl: ToastController,
+    private readonly cdr: ChangeDetectorRef,
   ) {
     addIcons({
       timeOutline,
@@ -722,6 +724,7 @@ export class OrdersPage implements OnInit, OnDestroy {
     this.itemCount = this.cartService.getItemCount();
     this.cartSub = this.cartService.cart$.subscribe(() => {
       this.itemCount = this.cartService.getItemCount();
+      this.refresh();
     });
 
     this.paymentSuccess =
@@ -734,6 +737,7 @@ export class OrdersPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.unsubscribeRealtime?.();
     this.cartSub?.unsubscribe();
   }
@@ -745,6 +749,7 @@ export class OrdersPage implements OnInit, OnDestroy {
 
     if (showSpinner) {
       this.loading = true;
+      this.refresh();
     }
 
     this.loadOrdersPromise = (async () => {
@@ -760,6 +765,9 @@ export class OrdersPage implements OnInit, OnDestroy {
           : 'Could not load orders. Please sign in again or check your connection and Supabase status.';
       } finally {
         this.loading = false;
+        // The app runs without zone.js, so plain property changes are not
+        // rendered on their own. Without this the skeleton never goes away.
+        this.refresh();
       }
     })();
 
@@ -767,6 +775,12 @@ export class OrdersPage implements OnInit, OnDestroy {
       await this.loadOrdersPromise;
     } finally {
       this.loadOrdersPromise = null;
+    }
+  }
+
+  private refresh(): void {
+    if (!this.destroyed) {
+      this.cdr.detectChanges();
     }
   }
 
@@ -840,6 +854,7 @@ export class OrdersPage implements OnInit, OnDestroy {
     try {
       await this.database.cancelOrder(order.id);
       order.status = 'Cancelled';
+      this.refresh();
       const toast = await this.toastCtrl.create({
         message: `Order #${order.id.slice(0, 8).toUpperCase()} was cancelled.`,
         duration: 3000,
