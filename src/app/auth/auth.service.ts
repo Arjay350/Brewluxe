@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment';
+import { SupabaseClient, User } from '@supabase/supabase-js';
+import { supabase } from '../services/supabase.client';
 
 export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'EMPLOYEE' | 'CUSTOMER';
 
@@ -16,10 +16,7 @@ export interface AuthUser {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly supabase: SupabaseClient = createClient(
-    environment.supabaseUrl,
-    environment.supabasePublishableKey,
-  );
+  private readonly supabase: SupabaseClient = supabase;
   private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
   readonly currentUser$ = this.currentUserSubject.asObservable();
 

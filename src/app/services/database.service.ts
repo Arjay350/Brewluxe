@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { createClient } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { supabase } from './supabase.client';
 import { CartItem, Product } from '../models/product.model';
 import type { ProductInput } from './product.service';
 import { AuthService } from '../auth/auth.service';
@@ -33,7 +33,7 @@ export interface ProfileDetails { display_name: string; email: string; phone: st
 
 @Injectable({ providedIn: 'root' })
 export class DatabaseService {
-  private readonly supabase = createClient(environment.supabaseUrl, environment.supabasePublishableKey);
+  private readonly supabase: SupabaseClient = supabase;
 
   constructor(private readonly auth: AuthService) {}
 
@@ -185,7 +185,10 @@ export class DatabaseService {
   }
 
   async getMyOrders(): Promise<Array<Record<string, unknown>>> {
-    const userId = this.auth.getCurrentUser()?.id;
+    // Ask the shared client for the live session first; the cached profile user
+    // can still be null for a moment right after sign-in or a page refresh.
+    const { data: sessionData } = await this.supabase.auth.getSession();
+    const userId = sessionData.session?.user.id ?? this.auth.getCurrentUser()?.id;
     if (!userId) return [];
 
     const controller = new AbortController();
